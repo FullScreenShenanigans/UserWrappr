@@ -215,6 +215,7 @@ declare module GameStartr {
         TimeHandler: TimeHandlr.ITimeHandlr;
         QuadsKeeper: QuadsKeepr.IQuadsKeepr;
         WorldSeeder: WorldSeedr.IWorldSeedr;
+        UserWrapper: any;
         reset(GameStarter: IGameStartr, customs: EightBittr.IEightBittrSettings): void;
         resetTimed(GameStarter: IGameStartr, customs: EightBittr.IEightBittrSettings): any[];
         resetAudioPlayer(GameStarter: IGameStartr, customs: IGameStartrCustoms): void;
@@ -354,6 +355,13 @@ module GameStartr {
         public TimeHandler: TimeHandlr.TimeHandlr;
         public QuadsKeeper: QuadsKeepr.QuadsKeepr;
         public WorldSeeder: WorldSeedr.WorldSeedr;
+
+        /**
+         * A "UserWrapper" is allowed to hook onto a GameStarter to add user
+         * interface controls. There's an actual UserWrapper module that commonly
+         * does this, but it isn't referenced in GameStartr.ts.
+         */
+        public UserWrapper: any;
 
         /**
          * Settings for individual modules are stored as sub-Objects here.

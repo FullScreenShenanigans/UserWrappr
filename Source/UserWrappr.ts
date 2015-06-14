@@ -15,7 +15,7 @@ module UserWrappr {
     /**
      * 
      */
-    class UserWrappr {
+    export class UserWrappr {
         /**
          * The GameStartr implementation this is wrapping around, such as
          * FullScreenMario or FullScreenPokemon.
@@ -83,6 +83,16 @@ module UserWrappr {
         private isFullScreen: boolean;
 
         /**
+         * Whether the page is currently known to be hidden.
+         */
+        private isPageHidden: boolean;
+
+        /**
+         * Generators used to generate HTML controls for the user.
+         */
+        private generators: { [i: string]: IOptionsGenerator };
+
+        /**
          * A utility Function to log message, commonly console.log.
          */
         private log: (...args: any[]) => string;
@@ -91,16 +101,6 @@ module UserWrappr {
          * The document element that will contain the game.
          */
         private documentElement = <HTMLHtmlElement>document.documentElement;
-
-        /**
-         * Generators used to generate HTML controls for the user.
-         */
-        private generators: { [i: string]: IOptionsGenerator } = {
-            OptionsButtons: new OptionsButtonsGenerator(this),
-            OptionsTable: new OptionsTableGenerator(this),
-            LevelEditor: new LevelEditorGenerator(this),
-            MapsGrid: new MapsGridGenerator(this)
-        };
 
         /**
          * A browser-dependent method for request to enter full screen mode.
@@ -166,19 +166,24 @@ module UserWrappr {
          * @param {GameStartr.IGameStartrCustoms} customs
          */
         resetGameStarter(settings: IUserWrapprSettings, customs: GameStartr.IGameStartrCustoms = {}): void {
-            var interfaceSettings: IGameStartrUISettings = <IGameStartrUISettings>this.GameStarter.settings["ui"];
+            var interfaceSettings: IGameStartrUISettings;
 
             this.loadGameStarter(this.fixCustoms(customs || {}));
-            this.loadControls(settings);
 
             window[settings.globalName || "GameStarter"] = this.GameStarter;
-            this.GameStarter.UserWrapper = self;
+            this.GameStarter.UserWrapper = this;
 
+            this.loadGenerators();
+            this.loadControls(settings);
+
+            interfaceSettings = <IGameStartrUISettings>this.GameStarter.settings["ui"];
             if (interfaceSettings.styleSheet) {
                 this.GameStarter.addPageStyles(interfaceSettings.styleSheet);
             }
 
             this.resetPageVisibilityHandlers();
+
+            this.GameStarter.gameStart();
         }
     
     
@@ -267,6 +272,13 @@ module UserWrappr {
          */
         getIsFullScreen(): boolean {
             return this.isFullScreen;
+        }
+
+        /**
+         * 
+         */
+        getIsPageHidden(): boolean {
+            return this.isPageHidden;
         }
 
         /**
@@ -363,7 +375,7 @@ module UserWrappr {
          */
         onPageHidden(): void {
             if (!this.GameStarter.GamesRunner.getPaused()) {
-                this.GameStarter.MapScreener.pageHidden = true;
+                this.isPageHidden = true;
                 this.GameStarter.GamesRunner.pause();
             }
         }
@@ -372,8 +384,8 @@ module UserWrappr {
          * 
          */
         onPageVisible(): void {
-            if (this.GameStarter.MapScreener.pageHidden) {
-                this.GameStarter.MapScreener.pageHidden = false;
+            if (this.isPageHidden) {
+                this.isPageHidden = false;
                 this.GameStarter.GamesRunner.play();
             }
         }
@@ -501,7 +513,7 @@ module UserWrappr {
         /**
          * 
          */
-        loadGameStarter(customs): void {
+        private loadGameStarter(customs): void {
             var section = document.getElementById("game");
 
             this.GameStarter = new this.GameStartrConstructor(customs);
@@ -519,14 +531,24 @@ module UserWrappr {
                 "onmousedown": this.GameStarter.InputWriter.makePipe("onmousedown", "which"),
                 "oncontextmenu": this.GameStarter.InputWriter.makePipe("oncontextmenu", null, true)
             });
+        }
 
-            this.GameStarter.gameStart();
+        /**
+         * 
+         */
+        private loadGenerators(): void {
+            this.generators = {
+                OptionsButtons: new OptionsButtonsGenerator(this),
+                OptionsTable: new OptionsTableGenerator(this),
+                LevelEditor: new LevelEditorGenerator(this),
+                MapsGrid: new MapsGridGenerator(this)
+            };
         }
     
         /**
          * 
          */
-        loadControls(settings): void {
+        private loadControls(settings): void {
             var section = document.getElementById("controls"),
                 schemas = settings.schemas,
                 length = schemas.length,
@@ -549,7 +571,7 @@ module UserWrappr {
         /** 
          * 
          */
-        loadControlDiv(schema): HTMLDivElement {
+        private loadControlDiv(schema): HTMLDivElement {
             var control = document.createElement("div"),
                 heading = document.createElement("h4"),
                 inner = document.createElement("div");
@@ -577,93 +599,11 @@ module UserWrappr {
 
             return control;
         }
-    
-        /* Utilities
-        */
-    
+
         /**
          * 
          */
-        ensureLocalStorageValue(child, details, schema): void {
-            if (child.constructor === Array) {
-                this.ensureLocalStorageValues(child, details, schema);
-                return;
-            }
-
-            var key: string = schema.title + "::" + details.title,
-                valueDefault: string = details.source.call(this, this.GameStarter).toString(),
-                value: string;
-
-            child.setAttribute("localStorageKey", key);
-            this.StatsHolder.addItem(key, {
-                "storeLocally": true,
-                "valueDefault": valueDefault
-            });
-
-            value = this.StatsHolder.getItem(key);
-            if (value !== "" && value !== child.value) {
-                child.value = value;
-
-                if (child.setValue) {
-                    child.setValue(value);
-                } else if (child.onchange) {
-                    child.onchange();
-                } else if (child.onclick) {
-                    child.onclick();
-                }
-            }
-        }
-    
-        /**
-         * 
-         */
-        ensureLocalStorageValues(children, details, schema): void {
-            var keyGeneral = schema.title + "::" + details.title,
-                values = details.source.call(this, this.GameStarter),
-                settings = {
-                    "storeLocally": true
-                },
-                key, child, value, i;
-
-            for (i = 0; i < children.length; i += 1) {
-                key = keyGeneral + "::" + i;
-                child = children[i];
-                child.setAttribute("localStorageKey", key);
-
-                this.StatsHolder.addItem(key, {
-                    "storeLocally": true,
-                    "valueDefault": values[i]
-                });
-
-                value = this.StatsHolder.getItem(key);
-                if (value !== "" && value !== child.value) {
-                    child.value = value;
-
-                    if (child.onchange) {
-                        child.onchange();
-                    } else if (child.onclick) {
-                        child.onclick();
-                    }
-                }
-            }
-        }
-    
-        /**
-         * 
-         */
-        storeLocalStorageValue(child, value): void {
-            var key: string = child.getAttribute("localStorageKey");
-
-            if (key) {
-                this.StatsHolder.setItem(key, value);
-            }
-        }
-    
-    
-        /**
-         * 
-         */
-        fixCustoms(customsRaw): any {
+        private fixCustoms(customsRaw): any {
             var customs = this.GameStartrConstructor.prototype.proliferate({}, customsRaw);
 
             if (!isFinite(customs.width)) {
@@ -685,15 +625,6 @@ module UserWrappr {
 
             return customs;
         }
-
-        getParentControlDiv(element): HTMLElement {
-            if (element.className === "control") {
-                return element;
-            } else if (!element.parentNode) {
-                return undefined;
-            }
-            return this.getParentControlDiv(element.parentNode);
-        }
     }
 
     /**
@@ -707,6 +638,93 @@ module UserWrappr {
         constructor(UserWrapper: UserWrappr) {
             this.UserWrapper = UserWrapper;
             this.GameStarter = this.UserWrapper.getGameStarter();
+        }
+
+        protected getParentControlDiv(element): HTMLElement {
+            if (element.className === "control") {
+                return element;
+            } else if (!element.parentNode) {
+                return undefined;
+            }
+            return this.getParentControlDiv(element.parentNode);
+        }
+
+        /**
+         * 
+         */
+        protected ensureLocalStorageValue(child, details, schema): void {
+            if (child.constructor === Array) {
+                this.ensureLocalStorageValues(child, details, schema);
+                return;
+            }
+
+            var key: string = schema.title + "::" + details.title,
+                valueDefault: string = details.source.call(this, this.GameStarter).toString(),
+                value: string;
+
+            child.setAttribute("localStorageKey", key);
+            this.GameStarter.StatsHolder.addItem(key, {
+                "storeLocally": true,
+                "valueDefault": valueDefault
+            });
+
+            value = this.GameStarter.StatsHolder.getItem(key);
+            if (value !== "" && value !== child.value) {
+                child.value = value;
+
+                if (child.setValue) {
+                    child.setValue(value);
+                } else if (child.onchange) {
+                    child.onchange();
+                } else if (child.onclick) {
+                    child.onclick();
+                }
+            }
+        }
+    
+        /**
+         * 
+         */
+        protected ensureLocalStorageValues(children, details, schema): void {
+            var keyGeneral = schema.title + "::" + details.title,
+                values = details.source.call(this, this.GameStarter),
+                settings = {
+                    "storeLocally": true
+                },
+                key, child, value, i;
+
+            for (i = 0; i < children.length; i += 1) {
+                key = keyGeneral + "::" + i;
+                child = children[i];
+                child.setAttribute("localStorageKey", key);
+
+                this.GameStarter.StatsHolder.addItem(key, {
+                    "storeLocally": true,
+                    "valueDefault": values[i]
+                });
+
+                value = this.GameStarter.StatsHolder.getItem(key);
+                if (value !== "" && value !== child.value) {
+                    child.value = value;
+
+                    if (child.onchange) {
+                        child.onchange();
+                    } else if (child.onclick) {
+                        child.onclick();
+                    }
+                }
+            }
+        }
+    
+        /**
+         * 
+         */
+        protected storeLocalStorageValue(child, value): void {
+            var key: string = child.getAttribute("localStorageKey");
+
+            if (key) {
+                this.GameStarter.StatsHolder.setItem(key, value);
+            }
         }
     }
 
@@ -735,7 +753,7 @@ module UserWrappr {
                 element.textContent = optionKeys[i];
 
                 element.onclick = function (schema, element) {
-                    if (scope.UserWrapper.getParentControlDiv(element).getAttribute("active") !== "on") {
+                    if (scope.getParentControlDiv(element).getAttribute("active") !== "on") {
                         return;
                     }
                     schema.callback.call(scope, scope.GameStarter, schema, element);
@@ -802,9 +820,9 @@ module UserWrappr {
                     row.appendChild(label);
                     row.appendChild(input);
 
-                    child = this.optionTypes[schema.options[i].type](input, details, schema);
+                    child = this.optionTypes[schema.options[i].type].call(this, input, details, schema);
                     if (details.storeLocally) {
-                        this.UserWrapper.ensureLocalStorageValue(child, details, schema);
+                        this.ensureLocalStorageValue(child, details, schema);
                     }
 
                     table.appendChild(row);
@@ -862,7 +880,7 @@ module UserWrappr {
                 }
 
                 if (details.storeLocally) {
-                    scope.UserWrapper.storeLocalStorageValue(input, newStatus.toString());
+                    scope.storeLocalStorageValue(input, newStatus.toString());
                 }
             };
 
@@ -898,19 +916,20 @@ module UserWrappr {
         }
 
         protected setNumberInput(input, details, schema) {
-            var child = document.createElement("input");
+            var child = document.createElement("input"),
+                scope: OptionsTableGenerator = this;
 
             child.type = "number";
-            child.value = Number(details.source.call(this, this.GameStarter)).toString();
+            child.value = Number(details.source.call(scope, scope.GameStarter)).toString();
             child.min = details.minimum || 0;
             child.max = details.maximum || Math.max(details.minimum + 10, 10);
 
             child.onchange = child.oninput = function () {
                 if (child.checkValidity()) {
-                    details.update.call(this, this.GameStarter, child.value);
+                    details.update.call(scope, scope.GameStarter, child.value);
                 }
                 if (details.storeLocally) {
-                    this.GameStarter.storeLocalStorageValue(child, child.value);
+                    scope.storeLocalStorageValue(child, child.value);
                 }
             };
 
@@ -922,20 +941,21 @@ module UserWrappr {
         protected setSelectInput(input, details, schema) {
             var child = document.createElement("select"),
                 options = details.options(),
+                scope = this,
                 i;
 
             for (i = 0; i < options.length; i += 1) {
                 child.appendChild(new Option(options[i]));
             }
 
-            child.value = details.source.call(this, this.GameStarter);
+            child.value = details.source.call(scope, scope.GameStarter);
 
             child.onchange = function () {
-                details.update.call(this, this.GameStarter, child.value);
+                details.update.call(scope, scope.GameStarter, child.value);
                 child.blur();
 
                 if (details.storeLocally) {
-                    this.UserWrapper.storeLocalStorageValue(child, child.value);
+                    scope.storeLocalStorageValue(child, child.value);
                 }
             };
 
@@ -949,7 +969,7 @@ module UserWrappr {
                 child;
 
             details.options = function () {
-                return Object.keys(this.UserWrapper.sizes);
+                return Object.keys(scope.UserWrapper.getSizes());
             };
 
             details.source = function () {
@@ -1105,7 +1125,7 @@ module UserWrappr {
                     element.className = "select-option maps-grid-option maps-grid-option-range";
                     element.textContent = i + "-" + j;
                     element.onclick = (function (callback) {
-                        if (scope.UserWrapper.getParentControlDiv(element).getAttribute("active") === "on") {
+                        if (scope.getParentControlDiv(element).getAttribute("active") === "on") {
                             callback();
                         }
                     }).bind(scope, schema.callback.bind(scope, scope.GameStarter, schema, element));

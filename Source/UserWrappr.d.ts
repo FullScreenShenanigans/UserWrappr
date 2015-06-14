@@ -9,22 +9,6 @@ interface HTMLElement {
     msCancelFullScreen: () => void;
 }
 
-declare module MapScreenr {
-    export interface IMapScreenr {
-        pageHidden: boolean;
-    }
-}
-
-declare module GameStartr {
-    export interface IGameStartr {
-        UserWrapper?: UserWrappr.IUserWrappr;
-    }
-
-    export interface IGameStartrStoredSettings {
-        ui: UserWrappr.IGameStartrUISettings;
-    }
-}
-
 declare module UserWrappr {
     export interface IGameStartrConstructor {
         new (GameStartrSettings?): GameStartr.IGameStartr;
