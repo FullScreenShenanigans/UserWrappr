@@ -14,16 +14,6 @@ declare module UserWrappr {
         new (GameStartrSettings?): GameStartr.IGameStartr;
     }
 
-    export interface IGameStartrUISettings extends GameStartr.IGameStartrCustomsObject {
-        helpSettings: IGameStartrUIHelpSettings;
-        schemas: UISchemas.ISchema[];
-        sizes: {
-            [i: string]: IUserWrapprSizeSummary;
-        };
-        styleSheet?: StyleSheet;
-        globalName?: string;
-    }
-
     export interface IGameStartrUIHelpSettings {
         globalNameAlias: string;
         openings: string[];
@@ -50,21 +40,45 @@ declare module UserWrappr {
             title: string;
         }
 
-        export interface IOptionsButtonsSchema extends ISchema {
-            options: IOptionsButtonSchema[];
+        export interface IOption {
+            title: string;
+            source: IOptionSource;
         }
 
-        export interface IOptionsButtonSchema {
+        export interface IOptionSource {
+            (GameStarter: GameStartr.IGameStartr, ...args: any[]): any;
+        }
+
+        export interface IChoiceElement extends HTMLElement {
+            setValue: (value: any) => void;
+        }
+
+        export interface IInputElement extends HTMLInputElement, IChoiceElement { }
+
+        export interface ISelectElement extends HTMLSelectElement, IChoiceElement {
+            valueOld?: string;
+        }
+
+        export interface IOptionsButtonsSchema extends ISchema {
+            options: IOptionSource | IOptionsButtonSchema[];
+            keyActive?: string;
+            assumeInactive?: boolean;
+        }
+
+        export interface IOptionsButtonSchema extends IOption {
             callback: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
-            source: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
+            source: IOptionSource;
             storeLocally?: boolean;
-            title: string;
             type: string;
         }
 
         export interface IOptionsTableSchema extends ISchema {
             actions?: IOptionsTableAction[];
-            options: any[];
+            options: IOptionsTableOption[];
+        }
+
+        export interface IOptionsTableTypes {
+            [i: string]: (input: any, details: IOptionsTableOption, schema: ISchema) => any;
         }
 
         export interface IOptionsTableAction {
@@ -72,24 +86,22 @@ declare module UserWrappr {
             action: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
         }
 
-        export interface IOptionsTableOption {
-            title: string;
+        export interface IOptionsTableOption extends IOption {
             type: string;
-            source: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => any;
             storeLocally?: boolean;
         }
 
         export interface IOptionsTableBooleanOption extends IOptionsTableOption {
             disable: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
             enable: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
-            options?: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => any[];
+            options?: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => string[];
             keyActive?: string;
             assumeInactive?: boolean;
         }
 
         export interface IOptionsTableKeysOption extends IOptionsTableOption {
             callback: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
-            source: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => any;
+            source: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => string[];
         }
 
         export interface IOptionsTableNumberOption extends IOptionsTableOption {
@@ -99,12 +111,16 @@ declare module UserWrappr {
         }
 
         export interface IOptionsTableSelectOption extends IOptionsTableOption {
-            options: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
+            options: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => string[];
             source: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
             update: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
         }
 
-        export interface IOptionsTableScreenSizeOption extends IOptionsTableOption { }
+        export interface IOptionsTableScreenSizeOption extends IOptionsTableOption {
+            options: () => string[];
+            source: () => IUserWrapprSizeSummary;
+            update: (GameStarter: GameStartr.IGameStartr, value: IUserWrapprSizeSummary) => ISelectElement;
+        }
 
         export interface IOptionsMapGridSchema extends ISchema {
             rangeX: number[];
@@ -116,6 +132,7 @@ declare module UserWrappr {
         }
 
         export interface IOptionsMapGridExtra {
+            title: string;
             callback: (GameStarter: GameStartr.IGameStartr, ...args: any[]) => void;
             extraElements: IOptionsMapGridExtraElement[];
         }
@@ -131,22 +148,29 @@ declare module UserWrappr {
     }
 
     export interface IUserWrapprSizeSummary {
-        full?: boolean;
         width: number;
         height: number;
+        name?: string;
+        full?: boolean;
     }
 
-    export interface IUserWrapprSettings {
-        GameStartrConstructor: IGameStartrConstructor;
+    export interface IUISettings {
         helpSettings: IGameStartrUIHelpSettings;
         globalName: string;
         sizes: {
             [i: string]: IUserWrapprSizeSummary;
         };
         sizeDefault: string;
+        schemas: UISchemas.ISchema[];
         allPossibleKeys?: string[];
         log?: (...args: any[]) => void;
         customs?: GameStartr.IGameStartrCustoms;
+        styleSheet?: StyleSheet;
+    }
+
+    export interface IUserWrapprSettings extends IUISettings, GameStartr.IGameStartrCustomsObject {
+        GameStartrConstructor: IGameStartrConstructor;
+
     }
 
     export interface IUserWrappr {
