@@ -13,7 +13,8 @@ module UserWrappr {
     "use strict";
 
     /**
-     * 
+     * A user interface manager made to work on top of GameStartr implementations
+     * and provide a configurable HTML display of options.
      */
     export class UserWrappr {
         /**
@@ -78,6 +79,16 @@ module UserWrappr {
         private currentSize: IUserWrapprSizeSummary;
 
         /**
+         * The CSS selector for the HTML element containing GameStarter's container.
+         */
+        private gameElementSelector: string;
+
+        /**
+         * The CSS selector for the HTMl element containing the UI buttons.
+         */
+        private gameControlsSelector: string;
+
+        /**
          * Whether the game is currently in full screen mode.
          */
         private isFullScreen: boolean;
@@ -88,14 +99,14 @@ module UserWrappr {
         private isPageHidden: boolean;
 
         /**
+         * A utility Function to log messages, commonly console.log.
+         */
+        private log: (...args: any[]) => string;
+
+        /**
          * Generators used to generate HTML controls for the user.
          */
         private generators: { [i: string]: IOptionsGenerator };
-
-        /**
-         * A utility Function to log message, commonly console.log.
-         */
-        private log: (...args: any[]) => string;
 
         /**
          * The document element that will contain the game.
@@ -142,6 +153,8 @@ module UserWrappr {
             this.importSizes(settings.sizes);
 
             this.gameNameAlias = this.helpSettings.globalNameAlias || "{%%%%GAME%%%%}";
+            this.gameElementSelector = settings.gameElementSelector || "game";
+            this.gameControlsSelector = settings.gameControlsSelector || "controls";
             this.log = settings.log || console.log.bind(console);
 
             this.isFullScreen = false;
@@ -161,8 +174,8 @@ module UserWrappr {
 
         /**
          * Resets the internal GameStarter by storing it under window, adding
-         * InputWritr pipes for input to the page, and setting additional CSS
-         * styles and page visiblity.
+         * InputWritr pipes for input to the page, creating the HTML buttons,
+         * and setting additional CSS styles and page visiblity.
          * 
          * @param {IUserWrapprSettings} settings
          * @param {GameStartr.IGameStartrCustoms} customs
@@ -174,7 +187,7 @@ module UserWrappr {
             this.GameStarter.UserWrapper = this;
 
             this.loadGenerators();
-            this.loadControls(settings);
+            this.loadControls(settings.schemas);
 
             if (settings.styleSheet) {
                 this.GameStarter.addPageStyles(settings.styleSheet);
@@ -190,126 +203,129 @@ module UserWrappr {
         */
 
         /**
-         * 
+         * @return {IGameStartrConstructor} The GameStartr implementation this
+         *                                  is wrapping around.
          */
         getGameStartrConstructor(): IGameStartrConstructor {
             return this.GameStartrConstructor;
         }
 
         /**
-         * 
+         * @return {GameStartr} The GameStartr instance created by GameStartrConstructor
+         *                      and stored under window.
          */
         getGameStarter(): GameStartr.IGameStartr {
             return this.GameStarter;
         }
 
         /**
-         * 
+         * @return {StatsHoldr} The StatsHoldr used to store UI settings.
          */
         getStatsHolder(): StatsHoldr.StatsHoldr {
             return this.StatsHolder;
         }
 
         /**
-         * 
+         * @return {Object} The settings used to construct this UserWrappr.
          */
-        getSettings(): IUISettings {
+        getSettings(): IUserWrapprSettings {
             return this.settings;
         }
 
         /**
-         * 
+         * @return {Object} The customs used to construct the GameStartr.
          */
         getCustoms(): GameStartr.IGameStartrCustoms {
             return this.customs;
         }
 
         /**
-         * 
+         * @return {Object} The help settings from settings.helpSettings.
          */
         getHelpSettings(): IGameStartrUIHelpSettings {
             return this.helpSettings;
         }
 
         /**
-         * 
+         * @return {String} What the global object is called, such as "window".
          */
         getGlobalName(): string {
             return this.globalName;
         }
 
         /**
-         * 
+         * @return {String} What to replace with the name of the game in help
+         *                  text settings.
          */
         getGameNameAlias(): string {
             return this.gameNameAlias;
         }
 
         /**
-         * 
+         * @return {String} All the keys the user is allowed to pick from.
          */
         getAllPossibleKeys(): string[] {
             return this.allPossibleKeys;
         }
 
         /**
-         * 
+         * @return {Object} The allowed sizes for the game.
          */
         getSizes(): { [i: string]: IUserWrapprSizeSummary } {
             return this.sizes;
         }
 
         /**
-         * 
+         * @return {Object} The currently selected size for the game.
          */
         getCurrentSize(): IUserWrapprSizeSummary {
             return this.currentSize;
         }
 
         /**
-         * 
+         * @return {Boolean} Whether the game is currently in full screen mode.
          */
         getIsFullScreen(): boolean {
             return this.isFullScreen;
         }
 
         /**
-         * 
+         * @return {Boolean} Whether the page is currently known to be hidden.
          */
         getIsPageHidden(): boolean {
             return this.isPageHidden;
         }
 
         /**
-         * 
+         * @return {Function} A utility Function to log messages, commonly console.log.
          */
         getLog(): (...args: any[]) => string {
             return this.log;
         }
 
         /**
-         * 
-         */
-        getDocumentElement(): HTMLHtmlElement {
-            return this.documentElement;
-        }
-
-        /**
-         * 
+         * @return {Object} Generators used to generate HTML controls for the user.
          */
         getGenerators(): { [i: string]: IOptionsGenerator } {
             return this.generators;
         }
 
         /**
-         * 
+         * @return {HTMLHtmlElement} The document element that contains the game.
+         */
+        getDocumentElement(): HTMLHtmlElement {
+            return this.documentElement;
+        }
+
+        /**
+         * @return {Function} The method to request to enter full screen mode.
          */
         getRequestFullScreen(): () => void {
             return this.requestFullScreen;
         }
 
         /**
-         * 
+         * @return {Function} The method to request to exit full screen mode.
          */
         getCancelFullScreen(): () => void {
             return this.cancelFullScreen;
@@ -320,7 +336,12 @@ module UserWrappr {
         */
 
         /**
+         * Sets the size of the GameStartr by resetting the game with the size
+         * information as part of its customs object. Full screen status is
+         * changed accordingly.
          * 
+         * @param {Mixed} The size to set, as a String to retrieve the size from
+         *                known info, or a container of settings.
          */
         setCurrentSize(size: string | IUserWrapprSizeSummary): void {
             if (typeof size === "string" || size.constructor === String) {
@@ -349,65 +370,20 @@ module UserWrappr {
         }
 
 
-        /* Page visibility
-        */
-
-        /**
-         * 
-         */
-        resetPageVisibilityHandlers(): void {
-            document.addEventListener("visibilitychange", this.handleVisibilityChange.bind(this));
-        }
-
-        /**
-         * 
-         */
-        handleVisibilityChange(event: Event): void {
-            switch (document.visibilityState) {
-                case "hidden":
-                    this.onPageHidden();
-                    return;
-                case "visible":
-                    this.onPageVisible();
-                    return;
-                default:
-                    return;
-            }
-        }
-
-        /**
-         * 
-         */
-        onPageHidden(): void {
-            if (!this.GameStarter.GamesRunner.getPaused()) {
-                this.isPageHidden = true;
-                this.GameStarter.GamesRunner.pause();
-            }
-        }
-
-        /**
-         * 
-         */
-        onPageVisible(): void {
-            if (this.isPageHidden) {
-                this.isPageHidden = false;
-                this.GameStarter.GamesRunner.play();
-            }
-        }
-
-
         /* Help dialog
         */
 
         /**
-         * 
+         * Displays the root help menu dialog, which contains all the openings
+         * for each help settings opening.
          */
         displayHelpMenu(): void {
             this.helpSettings.openings.forEach(this.logHelpText.bind(this));
         }
 
         /**
-         * 
+         * Displays the texts of each help settings options, all surrounded by
+         * instructions on how to focus on a group.
          */
         displayHelpOptions(): void {
             this.logHelpText(
@@ -416,8 +392,7 @@ module UserWrappr {
                 + ".UserWrapper.displayHelpOption(\"<group-name>\");`"
                 );
 
-            Object.keys(this.helpSettings.options)
-                .forEach(this.displayHelpGroupSummary.bind(this));
+            Object.keys(this.helpSettings.options).forEach(this.displayHelpGroupSummary.bind(this));
 
             this.logHelpText(
                 "\nTo focus on a group, enter `"
@@ -427,7 +402,9 @@ module UserWrappr {
         }
 
         /**
+         * Displays the summary for a help group of the given optionName.
          * 
+         * @param {String} optionName   The help group to display the summary of.
          */
         displayHelpGroupSummary(optionName: string): void {
             var actions: IGameStartrUIHelpOption[] = this.helpSettings.options[optionName],
@@ -448,7 +425,9 @@ module UserWrappr {
         }
 
         /**
+         * Displays the full information on a help group of the given optionName.
          * 
+         * @param {String} optionName   The help group to display the information of.
          */
         displayHelpOption(optionName: string): void {
             var actions: IGameStartrUIHelpOption[] = this.helpSettings.options[optionName],
@@ -461,25 +440,31 @@ module UserWrappr {
             for (i = 0; i < actions.length; i += 1) {
                 action = actions[i];
                 maxExampleLength = 0;
-                this.logHelpText(action.title);
+                this.logHelpText(action.title + " -- " + action.description);
 
-                for (j = 0; j < action.examples.length; j += 1) {
-                    example = action.examples[j];
-                    maxExampleLength = Math.max(
-                        maxExampleLength,
-                        this.filterHelpText("    " + example.code).length
-                        );
+                if (action.usage) {
+                    this.logHelpText(action.usage);
                 }
 
-                for (j = 0; j < action.examples.length; j += 1) {
-                    example = action.examples[j];
-                    this.logHelpText(
-                        this.padTextRight(
-                            this.filterHelpText("    " + example.code),
-                            maxExampleLength
-                            )
-                        + "  // " + example.comment
-                        );
+                if (action.examples) {
+                    for (j = 0; j < action.examples.length; j += 1) {
+                        example = action.examples[j];
+                        maxExampleLength = Math.max(
+                            maxExampleLength,
+                            this.filterHelpText("    " + example.code).length
+                            );
+                    }
+
+                    for (j = 0; j < action.examples.length; j += 1) {
+                        example = action.examples[j];
+                        this.logHelpText(
+                            this.padTextRight(
+                                this.filterHelpText("    " + example.code),
+                                maxExampleLength
+                                )
+                            + "  // " + example.comment
+                            );
+                    }
                 }
 
                 this.log("\n");
@@ -487,21 +472,28 @@ module UserWrappr {
         }
 
         /**
+         * Logs a bit of help text, filtered by this.filterHelpText.
          * 
+         * @param {String} text   The text to be filtered and logged.
          */
         logHelpText(text: string): void {
             this.log(this.filterHelpText(text));
         }
 
         /**
-         * 
+         * @param {String} text
+         * @return {String} The text, with gamenameAlias replaced by globalName.
          */
         filterHelpText(text: string): string {
             return text.replace(new RegExp(this.gameNameAlias, "g"), this.globalName);
         }
 
         /**
+         * Ensures a bit of text is of least a certain length.
          * 
+         * @param {String} text   The text to pad.
+         * @param {Number} length   How wide the text must be, at minimum.
+         * @return {String} The text with spaces padded to the right.
          */
         padTextRight(text: string, length: number): string {
             var diff: number = 1 + length - text.length;
@@ -513,6 +505,16 @@ module UserWrappr {
             return text + Array.call(Array, diff).join(" ");
         }
 
+
+        /* Settings parsing
+        */
+
+        /**
+         * Sets the internal this.sizes as a copy of the given sizes, but with
+         * names as members of every size summary.
+         * 
+         * @param {Object} sizes   The listing of preset sizes to go by.
+         */
         private importSizes(sizes: { [i: string]: IUserWrapprSizeSummary }): void {
             var i: string;
 
@@ -525,15 +527,97 @@ module UserWrappr {
             }
         }
 
+        /**
+         * 
+         */
+        private fixCustoms(customsRaw: GameStartr.IGameStartrCustoms): any {
+            var customs: GameStartr.IGameStartrCustoms = this.GameStartrConstructor.prototype.proliferate({}, customsRaw);
+
+            this.GameStartrConstructor.prototype.proliferate(customs, this.currentSize);
+
+            if (!isFinite(customs.width)) {
+                customs.width = document.body.clientWidth;
+            }
+            if (!isFinite(customs.height)) {
+                if (customs.full) {
+                    customs.height = screen.height;
+                } else if (this.isFullScreen) {
+                    // Guess for browser window...
+                    // @todo Actually compute this!
+                    customs.height = window.innerHeight - 140;
+                } else {
+                    customs.height = window.innerHeight;
+                }
+                // 49px from header, 35px from menus
+                customs.height -= 84;
+            }
+
+            return customs;
+        }
+
+
+        /* Page visibility
+        */
+
+        /**
+         * Adds a "visibilitychange" handler to the document bound to 
+         * this.handleVisibilityChange.
+         */
+        private resetPageVisibilityHandlers(): void {
+            document.addEventListener("visibilitychange", this.handleVisibilityChange.bind(this));
+        }
+
+        /**
+         * Handles a visibility change event by calling either this.onPageHidden
+         * or this.onPageVisible.
+         * 
+         * @param {Event} event
+         */
+        private handleVisibilityChange(event: Event): void {
+            switch (document.visibilityState) {
+                case "hidden":
+                    this.onPageHidden();
+                    return;
+                case "visible":
+                    this.onPageVisible();
+                    return;
+                default:
+                    return;
+            }
+        }
+
+        /**
+         * Reacts to the page becoming hidden by pausing the GameStartr.
+         */
+        private onPageHidden(): void {
+            if (!this.GameStarter.GamesRunner.getPaused()) {
+                this.isPageHidden = true;
+                this.GameStarter.GamesRunner.pause();
+            }
+        }
+
+        /**
+         * Reacts to the page becoming visible by unpausing the GameStartr.
+         */
+        private onPageVisible(): void {
+            if (this.isPageHidden) {
+                this.isPageHidden = false;
+                this.GameStarter.GamesRunner.play();
+            }
+        }
+
 
         /* Control section loaders
         */
 
         /**
+         * Loads the internal GameStarter, resetting it with the given customs
+         * and attaching handlers to document.body and the holder elements.
          * 
+         * @param {Object} customs   Custom arguments to pass to this.GameStarter.
          */
         private loadGameStarter(customs: GameStartr.IGameStartrCustoms): void {
-            var section: HTMLElement = document.getElementById("game");
+            var section: HTMLElement = <HTMLElement>document.querySelector(this.gameElementSelector);
 
             if (this.GameStarter) {
                 this.GameStarter.GamesRunner.pause();
@@ -544,7 +628,6 @@ module UserWrappr {
             section.textContent = "";
             section.appendChild(this.GameStarter.container);
 
-            // @todo Should everything go onto the section (not document.body)?
             this.GameStarter.proliferate(document.body, {
                 "onkeydown": this.GameStarter.InputWriter.makePipe("onkeydown", "keyCode"),
                 "onkeyup": this.GameStarter.InputWriter.makePipe("onkeyup", "keyCode")
@@ -557,7 +640,7 @@ module UserWrappr {
         }
 
         /**
-         * 
+         * Loads the internal OptionsGenerator instances under this.generators.
          */
         private loadGenerators(): void {
             this.generators = {
@@ -569,11 +652,13 @@ module UserWrappr {
         }
 
         /**
+         * Loads the externally facing UI controls and the internal StatsHolder,
+         * appending the controls to the controls HTML element.
          * 
+         * @param {Object[]} schemas   The schemas each a UI control to be made.
          */
-        private loadControls(settings: IUISettings): void {
-            var section: HTMLElement = document.getElementById("controls"),
-                schemas: UISchemas.ISchema[] = settings.schemas,
+        private loadControls(schemas: UISchemas.ISchema[]): void {
+            var section: HTMLElement = <HTMLElement>document.querySelector(this.gameControlsSelector),
                 length: number = schemas.length,
                 i: number;
 
@@ -592,7 +677,10 @@ module UserWrappr {
         }
 
         /** 
+         * Creates an individual UI control element based on a UI schema.
          * 
+         * @param {Object} schema
+         * @return {HTMLDivElement}
          */
         private loadControlDiv(schema: UISchemas.ISchema): HTMLDivElement {
             var control: HTMLDivElement = document.createElement("div"),
@@ -625,41 +713,14 @@ module UserWrappr {
 
             return control;
         }
-
-        /**
-         * 
-         */
-        private fixCustoms(customsRaw: GameStartr.IGameStartrCustoms): any {
-            var customs: GameStartr.IGameStartrCustoms = this.GameStartrConstructor.prototype.proliferate({}, customsRaw);
-
-            this.GameStartrConstructor.prototype.proliferate(customs, this.currentSize);
-
-            if (!isFinite(customs.width)) {
-                customs.width = document.body.clientWidth;
-            }
-            if (!isFinite(customs.height)) {
-                if (customs.full) {
-                    customs.height = screen.height;
-                } else if (this.isFullScreen) {
-                    // Guess for browser window...
-                    // @todo Actually compute this!
-                    customs.height = window.innerHeight - 140;
-                } else {
-                    customs.height = window.innerHeight;
-                }
-                // 49px from header, 35px from menus
-                customs.height -= 84;
-            }
-
-            return customs;
-        }
     }
 
     export module UISchemas {
         /**
-         * 
+         * Base class for options generators. These all store a UserWrapper and
+         * its GameStartr, along with a generate Function 
          */
-        export class AbstractOptionsGenerator {
+        export class AbstractOptionsGenerator implements IOptionsGenerator {
             /**
              * 
              */
@@ -679,7 +740,18 @@ module UserWrappr {
             }
 
             /**
+             * Generates a control element based on the provided schema.
+             */
+            generate(schema: ISchema): HTMLDivElement {
+                throw new Error("AbstractOptionsGenerator is abstract. Subclass it.");
+            }
+
+            /**
+             * Recursively searches for an element with the "control" class
+             * that's a parent of the given element.
              * 
+             * @param {HTMLElement} element
+             * @return {HTMLElement}
              */
             protected getParentControlDiv(element: HTMLElement): HTMLElement {
                 if (element.className === "control") {
@@ -692,7 +764,15 @@ module UserWrappr {
             }
 
             /**
+             * Ensures a child's required local storage value is being stored,
+             * and adds it to the internal GameStarter.StatsHolder if not. If it
+             * is, and the child's value isn't equal to it, the value is set.
              * 
+             * @param {Mixed} childRaw   An input or select element, or an Array
+             *                           thereof. 
+             * @param {Object} details   Details containing the title of the item 
+             *                           and the source Function to get its value.
+             * @param {Object} schema   The container schema this child is within.
              */
             protected ensureLocalStorageValue(childRaw: IChoiceElement | IChoiceElement[], details: IOption, schema: ISchema): void {
                 if (childRaw.constructor === Array) {
@@ -726,7 +806,13 @@ module UserWrappr {
             }
 
             /**
+             * The equivalent of ensureLocalStorageValue for an entire set of 
+             * elements, running the equivalent logic on all of them.
              * 
+             * @param {Mixed} childRaw   An Array of input or select elements.
+             * @param {Object} details   Details containing the title of the item 
+             *                           and the source Function to get its value.
+             * @param {Object} schema   The container schema this child is within.
              */
             protected ensureLocalStorageValues(children: (IInputElement | ISelectElement)[], details: IOption, schema: ISchema): void {
                 var keyGeneral: string = schema.title + "::" + details.title,
@@ -760,7 +846,11 @@ module UserWrappr {
             }
 
             /**
+             * Stores an element's value in the internal GameStarter.StatsHolder,
+             * if it has the "localStorageKey" attribute.
              * 
+             * @param {HTMLElement} child   An element with a value to store.
+             * @param {Mixed} value   What value is to be stored under the key.
              */
             protected storeLocalStorageValue(child: IInputElement | ISelectElement, value: any): void {
                 var key: string = child.getAttribute("localStorageKey");
@@ -772,7 +862,8 @@ module UserWrappr {
         }
 
         /**
-         * 
+         * A buttons generator for an options section that contains any number
+         * of general buttons.
          */
         export class OptionsButtonsGenerator extends AbstractOptionsGenerator implements IOptionsGenerator {
             generate(schema: IOptionsButtonsSchema): HTMLDivElement {
@@ -830,7 +921,7 @@ module UserWrappr {
         }
 
         /**
-         * 
+         * An options generator for a table of options,.
          */
         export class OptionsTableGenerator extends AbstractOptionsGenerator implements IOptionsGenerator {
             protected optionTypes: IOptionsTableTypes = {
@@ -1025,7 +1116,7 @@ module UserWrappr {
                     return Object.keys(scope.UserWrapper.getSizes());
                 };
 
-                details.source = function (): IUserWrapprSizeSummary {
+                details.source = function (): string {
                     return scope.UserWrapper.getCurrentSize().name;
                 };
 
@@ -1043,7 +1134,7 @@ module UserWrappr {
         }
 
         /**
-         * 
+         * Options generator for a LevelEditr dialog.
          */
         export class LevelEditorGenerator extends AbstractOptionsGenerator implements IOptionsGenerator {
             generate(schema: ISchema): HTMLDivElement {
@@ -1156,7 +1247,7 @@ module UserWrappr {
         }
 
         /**
-         * 
+         * Options generator for a grid of maps, along with other options.
          */
         export class MapsGridGenerator extends AbstractOptionsGenerator implements IOptionsGenerator {
             generate(schema: IOptionsMapGridSchema): HTMLDivElement {

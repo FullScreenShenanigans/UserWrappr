@@ -25,8 +25,8 @@ declare module UserWrappr {
     export interface IGameStartrUIHelpOption {
         title: string;
         description: string;
-        usage: string;
-        examples: IGameStartrUIHelpExample[];
+        usage?: string;
+        examples?: IGameStartrUIHelpExample[];
     }
 
     export interface IGameStartrUIHelpExample {
@@ -118,7 +118,7 @@ declare module UserWrappr {
 
         export interface IOptionsTableScreenSizeOption extends IOptionsTableOption {
             options: () => string[];
-            source: () => IUserWrapprSizeSummary;
+            source: () => string;
             update: (GameStarter: GameStartr.IGameStartr, value: IUserWrapprSizeSummary) => ISelectElement;
         }
 
@@ -163,6 +163,8 @@ declare module UserWrappr {
         sizeDefault: string;
         schemas: UISchemas.ISchema[];
         allPossibleKeys?: string[];
+        gameElementSelector?: string;
+        gameControlsSelector?: string;
         log?: (...args: any[]) => void;
         customs?: GameStartr.IGameStartrCustoms;
         styleSheet?: StyleSheet;
@@ -170,7 +172,6 @@ declare module UserWrappr {
 
     export interface IUserWrapprSettings extends IUISettings, GameStartr.IGameStartrCustomsObject {
         GameStartrConstructor: IGameStartrConstructor;
-
     }
 
     export interface IUserWrappr {
