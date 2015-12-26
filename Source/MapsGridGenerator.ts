@@ -2,9 +2,76 @@ module UserWrappr.UISchemas {
     "use strict";
 
     /**
-     * Options generator for a grid of maps, along with other options.
+     * Description of a user control for a map selector.
+     */
+    export interface IOptionsMapGridSchema extends ISchema {
+        /**
+         * Handler for a map being selected.
+         */
+        callback: IMapSelectionCallback;
+
+        /**
+         * If there is a table of maps, the start and end x-values.
+         */
+        rangeX?: [number, number];
+
+        /**
+         * If there is a table of maps, the start and end y-values.
+         */
+        rangeY?: [number, number];
+
+        /**
+         * Extra options to be displayed.
+         */
+        extras?: IOptionsMapGridExtra[];
+    }
+
+    /**
+     * An extra option to be displayed in a maps grid.
+     */
+    export interface IOptionsMapGridExtra {
+        /**
+         * The visible label of the extra's button.
+         */
+        title: string;
+
+        /**
+         * Handler for when this extra's button is triggered.
+         */
+        callback: IMapSelectionCallback;
+
+        /**
+         * Descriptions of any extra elements to be displayed.
+         */
+        extraElements: IOptionsMapGridExtraElement[];
+    }
+
+    /**
+     * A description of an extra element to place after a maps grid extra, to be piped
+     * directly int IGameStartr::createElement.
+     */
+    export interface IOptionsMapGridExtraElement {
+        /**
+         * The tag name of the element.
+         */
+        tag: string;
+
+        /**
+         * Options for the element, such as className or value.
+         */
+        options: any;
+    }
+
+    /**
+     * Options generator for a grid of maps.
      */
     export class MapsGridGenerator extends OptionsGenerator implements IOptionsGenerator {
+        /**
+         * Generates the HTML element for the maps.
+         * 
+         * @param schema   The overall description of the editor control.
+         * @returns An HTML element representing the schema.
+         */
         generate(schema: IOptionsMapGridSchema): HTMLDivElement {
             var output: HTMLDivElement = document.createElement("div");
 
@@ -21,6 +88,12 @@ module UserWrappr.UISchemas {
             return output;
         }
 
+        /**
+         * Generates a table of map selection buttons from x- and y- ranges.
+         * 
+         * @param schema   The overall description of the editor control.
+         * @returns An HTMLTableElement with a grid of map selection buttons.
+         */
         generateRangedTable(schema: IOptionsMapGridSchema): HTMLTableElement {
             var scope: MapsGridGenerator = this,
                 table: HTMLTableElement = document.createElement("table"),
@@ -40,7 +113,7 @@ module UserWrappr.UISchemas {
                     cell.className = "select-option maps-grid-option maps-grid-option-range";
                     cell.textContent = i + "-" + j;
                     cell.onclick = (function (callback: () => any): void {
-                        if (scope.getParentControlDiv(cell).getAttribute("active") === "on") {
+                        if (scope.getParentControlElement(cell).getAttribute("active") === "on") {
                             callback();
                         }
                     }).bind(scope, schema.callback.bind(scope, scope.GameStarter, schema, cell));
@@ -53,17 +126,19 @@ module UserWrappr.UISchemas {
             return table;
         }
 
+        /**
+         * Adds any specified extra elements to this control's element.
+         * 
+         * @param output   The element created by this generator.
+         * @param schema   The overall discription of the editor control.
+         */
         appendExtras(output: HTMLDivElement, schema: IOptionsMapGridSchema): void {
             var element: HTMLDivElement,
                 extra: IOptionsMapGridExtra,
-                i: string,
+                i: number,
                 j: number;
 
-            for (i in schema.extras) {
-                if (!schema.extras.hasOwnProperty(i)) {
-                    continue;
-                }
-
+            for (i = 0; i < schema.extras.length; i += 1) {
                 extra = schema.extras[i];
                 element = document.createElement("div");
 

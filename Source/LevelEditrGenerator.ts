@@ -2,9 +2,30 @@ module UserWrappr.UISchemas {
     "use strict";
 
     /**
+     * Description of a user control for a level editor.
+     */
+    export interface IOptionsEditorSchema extends ISchema {
+        /**
+         * Map names the user may load into the editor.
+         */
+        maps: IOptionsMapGridSchema;
+
+        /**
+         * Loads a built-in map into the editor after the user has clicked a button.
+         */
+        callback: IMapSelectionCallback;
+    }
+
+    /**
      * Options generator for a LevelEditr dialog.
      */
     export class LevelEditorGenerator extends OptionsGenerator implements IOptionsGenerator {
+        /**
+         * Generates a control for a level editor based on the provided schema.
+         * 
+         * @param schema   The overall description of the editor control.
+         * @returns An HTML element representing the schema.
+         */
         generate(schema: IOptionsEditorSchema): HTMLDivElement {
             var output: HTMLDivElement = document.createElement("div"),
                 starter: HTMLDivElement = document.createElement("div"),
@@ -34,6 +55,12 @@ module UserWrappr.UISchemas {
             return output;
         }
 
+        /**
+         * Creates an HTML element that can be clicked or dragged on to upload a JSON file
+         * into the level editor.
+         * 
+         * @returns An element containing the uploader div.
+         */
         protected createUploaderDiv(): HTMLDivElement {
             var uploader: HTMLDivElement = document.createElement("div"),
                 input: HTMLInputElement = document.createElement("input");
@@ -57,6 +84,13 @@ module UserWrappr.UISchemas {
             return uploader;
         }
 
+        /**
+         * Creates an HTML element that allows a user to choose between maps to load into
+         * the level editor.
+         * 
+         * @param schema   The overall description of the container user control.
+         * @returns An element containing the map selector.
+         */
         protected createMapSelectorDiv(schema: IOptionsEditorSchema): HTMLDivElement {
             var expanded: boolean = true,
                 generatorName: string = "MapsGrid",
@@ -116,25 +150,53 @@ module UserWrappr.UISchemas {
             return container;
         }
 
+        /**
+         * Handles a dragged file entering a map selector. Visual styles are updated.
+         * 
+         * @param uploader   The element being dragged onto.
+         * @param event   The event caused by the dragging.
+         */
         protected handleFileDragEnter(uploader: HTMLDivElement, event: LevelEditr.IDataMouseEvent): void {
             if (event.dataTransfer) {
                 event.dataTransfer.dropEffect = "copy";
             }
+
             uploader.className += " hovering";
         }
 
+        /**
+         * Handles a dragged file moving over a map selector.
+         * 
+         * @param uploader   The element being dragged onto.
+         * @param event   The event caused by the dragging.
+         */
         protected handleFileDragOver(uploader: HTMLElement, event: MouseEvent): boolean {
             event.preventDefault();
             return false;
         }
 
-        protected handleFileDragLeave(element: HTMLElement, event: LevelEditr.IDataMouseEvent): void {
+        /**
+         * Handles a dragged file leaving a map selector. Visual styles are updated.
+         * 
+         * @param uploader   The element being dragged onto.
+         * @param event   The event caused by the dragging.
+         */
+        protected handleFileDragLeave(uploader: HTMLElement, event: LevelEditr.IDataMouseEvent): void {
             if (event.dataTransfer) {
                 event.dataTransfer.dropEffect = "none";
             }
-            element.className = element.className.replace(" hovering", "");
+
+            uploader.className = uploader.className.replace(" hovering", "");
         }
 
+        /**
+         * Handles a dragged file being dropped onto a map selector. The file is read, and
+         * events attached to its progress.
+         * 
+         * @param input   The HTMLInputElement triggering the file event.
+         * @param uploader   The element being dragged onto.
+         * @param event   The event caused by the dragging.
+         */
         protected handleFileDrop(input: HTMLInputElement, uploader: HTMLDivElement, event: LevelEditr.IDataMouseEvent): void {
             var files: FileList = input.files || event.dataTransfer.files,
                 file: File = files[0],
@@ -150,14 +212,19 @@ module UserWrappr.UISchemas {
             reader.readAsText(file);
         }
 
+        /**
+         * Handles a file upload reporting some amount of progress.
+         * 
+         * @param file   The file being uploaded.
+         * @param uploader   The element the file was being dragged onto.
+         * @param event   The event caused by the progress.
+         */
         protected handleFileUploadProgress(file: File, uploader: HTMLDivElement, event: LevelEditr.IDataProgressEvent): void {
-            var percent: number;
-
             if (!event.lengthComputable) {
                 return;
             }
 
-            percent = Math.round((event.loaded / event.total) * 100);
+            var percent: number = Math.round((event.loaded / event.total) * 100);
 
             if (percent > 100) {
                 percent = 100;
@@ -166,6 +233,14 @@ module UserWrappr.UISchemas {
             uploader.innerText = "Uploading '" + file.name + "' (" + percent + "%)...";
         }
 
+        /**
+         * Handles a file upload completing. The file's contents are loaded into
+         * the level editor.
+         * 
+         * @param file   The file being uploaded.
+         * @param uploader   The element the file was being dragged onto.
+         * @param event   The event caused by the upload completing.
+         */
         protected handleFileUploadCompletion(file: File, uploader: HTMLDivElement, event: LevelEditr.IDataProgressEvent): void {
             this.GameStarter.LevelEditor.handleUploadCompletion(event);
             uploader.innerText = uploader.getAttribute("textOld");

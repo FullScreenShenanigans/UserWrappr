@@ -2,10 +2,66 @@ module UserWrappr.UISchemas {
     "use strict";
 
     /**
+     * Description of a user control for a listing of buttons.
+     */
+    export interface IOptionsButtonsSchema extends ISchema {
+        /**
+         * Descriptions of the options to be displayed as buttons.
+         */
+        options: IOptionSource | IOptionsButtonSchema[];
+
+        /**
+         * A general, default callback for when a button is clicked.
+         */
+        callback: (GameStarter: IGameStartr) => void;
+
+        /**
+         * A key to add to buttons when they're active.
+         */
+        keyActive?: string;
+
+        /**
+         * Whether buttons should be assumed to be inactive visually.
+         */
+        assumeInactive?: boolean;
+    }
+
+    /**
+     * Description for a single button in a buttons schema.
+     */
+    export interface IOptionsButtonSchema extends IOption {
+        /**
+         * A callback for when this specific button is pressed.
+         */
+        callback: (GameStarter: IGameStartr) => void;
+        
+        /**
+         * A source for the button's initial value.
+         */
+        source: IOptionSource;
+
+        /**
+         * Whether the button's value should be stored locally between sessions.
+         */
+        storeLocally?: boolean;
+
+        /**
+       ' * What type of button this is, as keyed in the generator.
+         */
+        type: string;
+    }
+
+    /**
      * A buttons generator for an options section that contains any number
      * of general buttons.
      */
     export class ButtonsGenerator extends OptionsGenerator implements IOptionsGenerator {
+        /**
+         * Generates a control element with buttons described in the schema.
+         * 
+         * @param schema   A description of the element to create.
+         * @returns An HTML element representing the schema.
+         */
         generate(schema: IOptionsButtonsSchema): HTMLDivElement {
             var output: HTMLDivElement = document.createElement("div"),
                 options: IOptionsButtonSchema[] = schema.options instanceof Function
@@ -29,7 +85,7 @@ module UserWrappr.UISchemas {
                 element.textContent = optionKeys[i];
 
                 element.onclick = function (schema: IOptionsButtonSchema, element: HTMLDivElement): void {
-                    if (scope.getParentControlDiv(element).getAttribute("active") !== "on") {
+                    if (scope.getParentControlElement(element).getAttribute("active") !== "on") {
                         return;
                     }
                     schema.callback.call(scope, scope.GameStarter, schema, element);
@@ -59,6 +115,33 @@ module UserWrappr.UISchemas {
             }
 
             return output;
+        }
+
+        /**
+         * Ensures a value exists in localStorage, and has the given settings. If
+         * it doesn't have a value, the schema's callback is used to provide one.
+         * 
+         * @param child   The value's representational HTML element.
+         * @param details   Details 
+         * @param schema   
+         */
+        protected ensureLocalStorageButtonValue(child: HTMLDivElement, details: IOptionsButtonSchema, schema: IOptionsButtonsSchema): void {
+            var key: string = schema.title + "::" + details.title,
+                valueDefault: string = details.source.call(this, this.GameStarter).toString(),
+                value: string;
+
+            child.setAttribute("localStorageKey", key);
+
+            this.GameStarter.ItemsHolder.addItem(key, {
+                "storeLocally": true,
+                "valueDefault": valueDefault
+            });
+
+            value = this.GameStarter.ItemsHolder.getItem(key);
+            if (value.toString().toLowerCase() === "true") {
+                details[schema.keyActive || "active"] = true;
+                schema.callback.call(this, this.GameStarter, schema, child);
+            }
         }
     }
 }
