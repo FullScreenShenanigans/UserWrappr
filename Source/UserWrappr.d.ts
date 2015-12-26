@@ -1,3 +1,5 @@
+/* tslint:disable:interface-name */
+
 interface HTMLElement {
     requestFullScreen: () => void;
     webkitRequestFullScreen: () => void;
@@ -27,7 +29,7 @@ declare module UserWrappr {
     type IGameStartrCustoms = any;
 
     export interface IGameStartrConstructor {
-        new (GameStartrSettings?): IGameStartr;
+        new (...args: any[]): IGameStartr;
     }
 
     export interface IGameStartrUIHelpSettings {
