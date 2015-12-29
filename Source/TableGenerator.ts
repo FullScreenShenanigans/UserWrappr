@@ -173,7 +173,7 @@ module UserWrappr.UISchemas {
          * @param GameStarter   The GameStarter this option is controlling.
          * @param value   The newly selected size information.
          */
-        update: (GameStarter: IGameStartr, value: IUserWrapprSizeSummary) => void;
+        update: (GameStarter: IGameStartr, value: ISizeSummary) => void;
     }
 
     /**
@@ -442,7 +442,7 @@ module UserWrappr.UISchemas {
                 return scope.UserWrapper.getCurrentSize().name;
             };
 
-            details.update = function (GameStarter: IGameStartr, value: IUserWrapprSizeSummary | string): ISelectElement {
+            details.update = function (GameStarter: IGameStartr, value: ISizeSummary | string): ISelectElement {
                 if (value === scope.UserWrapper.getCurrentSize()) {
                     return undefined;
                 }

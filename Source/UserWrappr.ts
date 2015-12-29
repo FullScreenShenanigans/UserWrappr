@@ -3,11 +3,6 @@
 // @echo '/// <reference path="ItemsHoldr-0.2.1.ts" />'
 // @echo '/// <reference path="InputWritr-0.2.0.ts" />'
 // @echo '/// <reference path="LevelEditr-0.2.0.ts" />'
-// @echo '/// <reference path="OptionsGenerator.ts" />'
-// @echo '/// <reference path="ButtonsGenerator.ts" />'
-// @echo '/// <reference path="LevelEditrGenerator.ts" />'
-// @echo '/// <reference path="MapsGridGenerator.ts" />'
-// @echo '/// <reference path="TableGenerator.ts" />'
 
 // @ifdef INCLUDE_DEFINITIONS
 /// <reference path="References/DeviceLayr-0.2.0.ts" />
@@ -24,6 +19,11 @@
 // @endif
 
 // @include ../Source/UserWrappr.d.ts
+// @include OptionsGenerator.ts
+// @include ButtonsGenerator.ts
+// @include LevelEditrGenerator.ts
+// @include MapsGridGenerator.ts
+// @include TableGenerator.ts
 
 module UserWrappr {
     "use strict";
@@ -33,6 +33,15 @@ module UserWrappr {
      * and provide a configurable HTML display of options.
      */
     export class UserWrappr {
+        /**
+         * The default list of all allowed keyboard keys.
+         */
+        private static allPossibleKeys: string[] = [
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+            "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+            "up", "right", "down", "left", "space", "shift", "ctrl"
+        ];
+
         /**
          * The GameStartr implementation this is wrapping around, such as
          * FullScreenMario or FullScreenPokemon.
@@ -48,7 +57,7 @@ module UserWrappr {
         /**
          * A ItemsHoldr used to store UI settings.
          */
-        private ItemsHolder: ItemsHoldr.ItemsHoldr;
+        private ItemsHolder: ItemsHoldr.IItemsHoldr;
 
         /**
          * The settings used to construct the UserWrappr.
@@ -64,7 +73,7 @@ module UserWrappr {
          * Help settings specifically for the user interface, obtained from
          * settings.helpSettings.
          */
-        private helpSettings: IGameStartrUIHelpSettings;
+        private helpSettings: IUIHelpSettings;
 
         /**
          * What the global object is called (typically "window" for browser 
@@ -73,7 +82,7 @@ module UserWrappr {
         private globalName: string;
 
         /**
-         * What to replace with the name of the game in help text settings.
+         * What to replace with the name of the game in help text.
          */
         private gameNameAlias: string;
 
@@ -85,14 +94,12 @@ module UserWrappr {
         /**
          * The allowed sizes for the game.
          */
-        private sizes: {
-            [i: string]: IUserWrapprSizeSummary
-        };
+        private sizes: ISizeSummaries;
 
         /**
          * The currently selected size for the game.
          */
-        private currentSize: IUserWrapprSizeSummary;
+        private currentSize: ISizeSummary;
 
         /**
          * The CSS selector for the HTML element containing GameStarter's container.
@@ -125,14 +132,14 @@ module UserWrappr {
         private generators: { [i: string]: IOptionsGenerator };
 
         /**
-         * The document element that will contain the game.
-         */
-        private documentElement: HTMLHtmlElement = <HTMLHtmlElement>document.documentElement;
-
-        /**
          * Identifier for the interval Function checking for device input.
          */
         private deviceChecker: number;
+
+        /**
+         * The document element that will contain the game.
+         */
+        private documentElement: HTMLHtmlElement = <HTMLHtmlElement>document.documentElement;
 
         /**
          * A browser-dependent method for request to enter full screen mode.
@@ -193,11 +200,10 @@ module UserWrappr {
             this.globalName = settings.globalName;
             this.helpSettings = this.settings.helpSettings;
 
+            this.sizes = this.importSizes(settings.sizes);
+
             this.customs = settings.customs || {};
-
-            this.importSizes(settings.sizes);
-
-            this.gameNameAlias = this.helpSettings.globalNameAlias || "{%%%%GAME%%%%}";
+            this.gameNameAlias = settings.helpSettings.globalNameAlias || "{%%%%GAME%%%%}";
             this.gameElementSelector = settings.gameElementSelector || "#game";
             this.gameControlsSelector = settings.gameControlsSelector || "#controls";
             this.logger = settings.log || console.log.bind(console);
@@ -205,11 +211,7 @@ module UserWrappr {
             this.isFullScreen = false;
             this.setCurrentSize(this.sizes[settings.sizeDefault]);
 
-            this.allPossibleKeys = settings.allPossibleKeys || [
-                "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
-                "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-                "up", "right", "down", "left", "space", "shift", "ctrl"
-            ];
+            this.allPossibleKeys = settings.allPossibleKeys || UserWrappr.allPossibleKeys;
 
             // Size information is also passed to modules via this.customs
             this.GameStartrConstructor.prototype.proliferate(this.customs, this.currentSize, true);
@@ -225,7 +227,7 @@ module UserWrappr {
          * @param settings   Settings for the GameStartr constructor.
          * @param customs   Additional settings for sizing information.
          */
-        resetGameStarter(settings: IUserWrapprSettings, customs: any = {}): void {
+        resetGameStarter(settings: IUserWrapprSettings, customs: IGameStartrCustoms = {}): void {
             this.loadGameStarter(this.fixCustoms(customs));
 
             window[settings.globalName] = this.GameStarter;
@@ -266,7 +268,7 @@ module UserWrappr {
         /**
          * @returns The ItemsHoldr used to store UI settings.
          */
-        getItemsHolder(): ItemsHoldr.ItemsHoldr {
+        getItemsHolder(): ItemsHoldr.IItemsHoldr {
             return this.ItemsHolder;
         }
 
@@ -278,7 +280,7 @@ module UserWrappr {
         }
 
         /**
-         * @returns The customs used to construct the GameStartr.
+         * @returns The customs used to construct the IGameStartr.
          */
         getCustoms(): IGameStartrCustoms {
             return this.customs;
@@ -287,7 +289,7 @@ module UserWrappr {
         /**
          * @returns The help settings from settings.helpSettings.
          */
-        getHelpSettings(): IGameStartrUIHelpSettings {
+        getHelpSettings(): IUIHelpSettings {
             return this.helpSettings;
         }
 
@@ -299,8 +301,7 @@ module UserWrappr {
         }
 
         /**
-         * @returns What to replace with the name of the game in help
-         *                  text settings.
+         * @returns What to replace with the name of the game in help text.
          */
         getGameNameAlias(): string {
             return this.gameNameAlias;
@@ -316,14 +317,14 @@ module UserWrappr {
         /**
          * @returns The allowed sizes for the game.
          */
-        getSizes(): { [i: string]: IUserWrapprSizeSummary } {
+        getSizes(): ISizeSummaries {
             return this.sizes;
         }
 
         /**
          * @returns The currently selected size for the game.
          */
-        getCurrentSize(): IUserWrapprSizeSummary {
+        getCurrentSize(): ISizeSummary {
             return this.currentSize;
         }
 
@@ -351,7 +352,7 @@ module UserWrappr {
         /**
          * @returns Generators used to generate HTML controls for the user.
          */
-        getGenerators(): { [i: string]: IOptionsGenerator } {
+        getGenerators(): IOptionsGenerators {
             return this.generators;
         }
 
@@ -395,17 +396,17 @@ module UserWrappr {
          * @param size The size to set, as a String to retrieve the size from
          *             known info, or a container of settings.
          */
-        setCurrentSize(size: string | IUserWrapprSizeSummary): void {
+        setCurrentSize(size: string | ISizeSummary): void {
             if (typeof size === "string" || size.constructor === String) {
                 if (!this.sizes.hasOwnProperty(<string>size)) {
                     throw new Error("Size " + size + " does not exist on the UserWrappr.");
                 }
-                size = <IUserWrapprSizeSummary>this.sizes[<string>size];
+                size = <ISizeSummary>this.sizes[<string>size];
             }
 
             this.customs = this.fixCustoms(this.customs);
 
-            if ((<IUserWrapprSizeSummary>size).full) {
+            if ((<ISizeSummary>size).full) {
                 this.requestFullScreen();
                 this.isFullScreen = true;
             } else if (this.isFullScreen) {
@@ -413,7 +414,7 @@ module UserWrappr {
                 this.isFullScreen = false;
             }
 
-            this.currentSize = <IUserWrapprSizeSummary>size;
+            this.currentSize = <ISizeSummary>size;
 
             if (this.GameStarter) {
                 this.GameStarter.container.parentNode.removeChild(this.GameStarter.container);
@@ -459,8 +460,8 @@ module UserWrappr {
          * @param optionName   The help group to display the summary of.
          */
         displayHelpGroupSummary(optionName: string): void {
-            var actions: IGameStartrUIHelpOption[] = this.helpSettings.options[optionName],
-                action: IGameStartrUIHelpOption,
+            var actions: IHelpOption[] = this.helpSettings.options[optionName],
+                action: IHelpOption,
                 maxTitleLength: number = 0,
                 i: number;
 
@@ -482,9 +483,9 @@ module UserWrappr {
          * @param optionName   The help group to display the information of.
          */
         displayHelpOption(optionName: string): void {
-            var actions: IGameStartrUIHelpOption[] = this.helpSettings.options[optionName],
-                action: IGameStartrUIHelpOption,
-                example: IGameStartrUIHelpExample,
+            var actions: IHelpOption[] = this.helpSettings.options[optionName],
+                action: IHelpOption,
+                example: IHelpExample,
                 maxExampleLength: number,
                 i: number,
                 j: number;
@@ -588,21 +589,22 @@ module UserWrappr {
         */
 
         /**
-         * Sets the internal this.sizes as a copy of the given sizes, but with
-         * names as members of every size summary.
+         * Creates as a copy of the given sizes with names as members.
          * 
-         * @param sizes   The listing of preset sizes to go by.
+         * @param sizesRaw   The listing of preset sizes to go by.
+         * @returns A copy of sizes, with names as members.
          */
-        private importSizes(sizes: { [i: string]: IUserWrapprSizeSummary }): void {
-            var i: string;
+        private importSizes(sizesRaw: ISizeSummaries): ISizeSummaries {
+            var sizes: ISizeSummaries = this.GameStartrConstructor.prototype.proliferate({}, sizesRaw),
+                i: string;
 
-            this.sizes = this.GameStartrConstructor.prototype.proliferate({}, sizes);
-
-            for (i in this.sizes) {
-                if (this.sizes.hasOwnProperty(i)) {
-                    this.sizes[i].name = this.sizes[i].name || i;
+            for (i in sizes) {
+                if (sizes.hasOwnProperty(i)) {
+                    sizes[i].name = sizes[i].name || i;
                 }
             }
+
+            return sizes;
         }
 
         /**

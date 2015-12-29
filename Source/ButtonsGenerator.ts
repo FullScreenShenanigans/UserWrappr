@@ -34,7 +34,7 @@ module UserWrappr.UISchemas {
          * A callback for when this specific button is pressed.
          */
         callback: (GameStarter: IGameStartr) => void;
-        
+
         /**
          * A source for the button's initial value.
          */
@@ -46,7 +46,7 @@ module UserWrappr.UISchemas {
         storeLocally?: boolean;
 
         /**
-       ' * What type of button this is, as keyed in the generator.
+         * What type of button this is, as keyed in the generator.
          */
         type: string;
     }
