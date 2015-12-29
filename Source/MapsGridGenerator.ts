@@ -150,7 +150,9 @@ module UserWrappr.UISchemas {
 
                 if (extra.extraElements) {
                     for (j = 0; j < extra.extraElements.length; j += 1) {
-                        output.appendChild(this.GameStarter.createElement.apply(this.GameStarter, extra.extraElements[j]));
+                        output.appendChild(this.GameStarter.createElement(
+                            extra.extraElements[j].tag,
+                            extra.extraElements[j].options));
                     }
                 }
             }
