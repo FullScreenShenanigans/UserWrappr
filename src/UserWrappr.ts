@@ -106,20 +106,20 @@ export class UserWrappr implements IUserWrappr {
 
         this.resetControls();
 
-        this.gameStarter.container.addEventListener(
-            "onkeydown",
+        window.addEventListener(
+            "keydown",
             this.gameStarter.inputWriter.makePipe("onkeydown", "keyCode"));
 
-        this.gameStarter.container.addEventListener(
-            "onkeyup",
+        window.addEventListener(
+            "keyup",
             this.gameStarter.inputWriter.makePipe("onkeyup", "keyCode"));
 
-        this.gameStarter.container.addEventListener(
-            "onmousedown",
+        window.addEventListener(
+            "mousedown",
             this.gameStarter.inputWriter.makePipe("onmousedown", "which"));
 
-        this.gameStarter.container.addEventListener(
-            "oncontextmenu",
+        window.addEventListener(
+            "contextmenu",
             this.gameStarter.inputWriter.makePipe("oncontextmenu", "", true));
 
         this.document.addEventListener(
@@ -279,8 +279,8 @@ export class UserWrappr implements IUserWrappr {
     private createControlsContainer(schemas: ISchema[]): HTMLElement {
         const section: HTMLElement = document.createElement("section");
 
+        section.className = "controls length-" + schemas.length;
         section.textContent = "";
-        section.className = "length-" + length;
 
         for (const schema of schemas) {
             section.appendChild(this.createControlDiv(schema));
