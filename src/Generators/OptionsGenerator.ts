@@ -41,6 +41,6 @@ export abstract class OptionsGenerator implements IOptionsGenerator {
             return element;
         }
 
-        return this.getParentControlElement(element.parentElement);
+        return this.getParentControlElement(element.parentElement!);
     }
 }
