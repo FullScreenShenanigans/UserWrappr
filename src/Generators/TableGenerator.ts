@@ -325,12 +325,12 @@ export class TableGenerator extends OptionsGenerator implements IOptionsGenerato
                 }
             }
 
-            child.onchange = ((child: ISelectElement): void => {
+            child.onchange = (): void => {
                 details.callback.call(this, this.userWrapper.getGameStarter(), child.valueOld, child.value);
                 if (details.storeLocally) {
                     this.storeLocalStorageValue(child, child.value);
                 }
-            }).bind(this, child);
+            };
 
             children.push(child);
             input.appendChild(child);
