@@ -1,6 +1,7 @@
 import { GameStartr } from "gameStartr/lib/GameStartr";
 import { IPipe } from "inputwritr/lib/IInputWritr";
 import { IScreenVisibilityTogglerSettings } from "./ScreenVisibilityToggler";
+import { ISizeSummaries } from "./SizeChanger";
 
 /**
  * Pipes an input event listener to an InputWritr pipe.
@@ -22,9 +23,24 @@ export interface IUserWrapprSettings extends IScreenVisibilityTogglerSettings {
     addInputPipe: IAddInputPipe;
 
     /**
+     * Closes any full screen state.
+     */
+    cancelFullScreen: () => void;
+
+    /**
      * GameStartr instance being wrapped around.
      */
     gameStarter: GameStartr;
+
+    /**
+     * Requests to start a full screen state.
+     */
+    requestFullScreen: () => void;
+
+    /**
+     * Size summaries keyed by name.
+     */
+    sizes: ISizeSummaries;
 }
 
 /**
@@ -35,4 +51,11 @@ export interface IUserWrappr {
      * Resets event listener pipes.
      */
     resetEvents(): void;
+
+    /**
+     * Resets to a particular size.
+     *
+     * @param size   The size to set, as either its name or settings.
+     */
+    setSize(size: string | ISizeSummary): void;
 }

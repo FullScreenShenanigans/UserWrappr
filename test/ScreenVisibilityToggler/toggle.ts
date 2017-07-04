@@ -23,7 +23,7 @@ it("pauses a playing game when the document hides", () => {
     toggler.toggle();
 
     // Assert
-    chai.expect(settings.pause.called).to.be.equal(true);
+    chai.expect(settings.pause.calledOnce).to.be.equal(true);
 });
 
 it("doesn't pause a paused game when the document hides", () => {
@@ -38,7 +38,7 @@ it("doesn't pause a paused game when the document hides", () => {
     toggler.toggle();
 
     // Assert
-    chai.expect(settings.play.called).to.be.equal(false);
+    chai.expect(settings.play.calledOnce).to.be.equal(false);
 });
 
 it("doesn't play a playing game when the document becomes visible", () => {
@@ -52,7 +52,7 @@ it("doesn't play a playing game when the document becomes visible", () => {
     toggler.toggle();
 
     // Assert
-    chai.expect(settings.play.called).to.be.equal(false);
+    chai.expect(settings.play.calledOnce).to.be.equal(false);
 });
 
 it("doesn't play an externally paused game when the document becomes visible", () => {
@@ -66,7 +66,7 @@ it("doesn't play an externally paused game when the document becomes visible", (
     toggler.toggle();
 
     // Assert
-    chai.expect(settings.play.called).to.be.equal(false);
+    chai.expect(settings.play.calledOnce).to.be.equal(false);
 });
 
 it("plays an intentionally paused game when the document becomes visible", () => {
@@ -84,5 +84,5 @@ it("plays an intentionally paused game when the document becomes visible", () =>
     toggler.toggle();
 
     // Assert
-    chai.expect(settings.play.called).to.be.equal(true);
+    chai.expect(settings.play.calledOnce).to.be.equal(true);
 });
