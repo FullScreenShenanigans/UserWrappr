@@ -3,7 +3,7 @@ import { stub } from "sinon";
 import { SizeChanger } from "../../src/SizeChanger";
 import { it } from "../main";
 
-const createDefaultSettings = () => ({
+const stubSettings = () => ({
     cancelFullScreen: stub(),
     onReset: stub(),
     requestFullScreen: stub(),
@@ -26,7 +26,7 @@ const createDefaultSettings = () => ({
 
 it("resets to a new given size string", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const sizeChanger = new SizeChanger(settings);
 
     // Act
@@ -38,7 +38,7 @@ it("resets to a new given size string", () => {
 
 it("resets to a new given size summary", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const sizeChanger = new SizeChanger(settings);
 
     // Act
@@ -50,7 +50,7 @@ it("resets to a new given size summary", () => {
 
 it("resets to a repeated size", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const sizeChanger = new SizeChanger(settings);
 
     // Act
@@ -63,7 +63,7 @@ it("resets to a repeated size", () => {
 
 it("requests full screen on a full size", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const sizeChanger = new SizeChanger(settings);
 
     // Act
@@ -75,7 +75,7 @@ it("requests full screen on a full size", () => {
 
 it("cancels full screen on a non-full size after a full size", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const sizeChanger = new SizeChanger(settings);
 
     sizeChanger.setSize(settings.sizes.full);

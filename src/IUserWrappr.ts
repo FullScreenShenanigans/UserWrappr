@@ -1,7 +1,7 @@
 import { GameStartr } from "gameStartr/lib/GameStartr";
 import { IPipe } from "inputwritr/lib/IInputWritr";
 import { IScreenVisibilityTogglerSettings } from "./ScreenVisibilityToggler";
-import { ISizeSummaries } from "./SizeChanger";
+import { ISizeSummaries, ISizeSummary } from "./SizeChanger";
 
 /**
  * Pipes an input event listener to an InputWritr pipe.

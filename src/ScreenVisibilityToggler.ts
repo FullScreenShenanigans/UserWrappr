@@ -50,7 +50,7 @@ export class ScreenVisibilityToggler {
     private isPageHiddenDuringPlay: boolean = false;
 
     /**
-     * Settings to be used for initialization.
+     * Settings used for initialization.
      */
     private readonly settings: IScreenVisibilityTogglerSettings;
 

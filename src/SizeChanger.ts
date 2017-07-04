@@ -63,7 +63,7 @@ export class SizeChanger {
     private isFullScreen: boolean = false;
 
     /**
-     * Settings to be used for initialization.
+     * Settings used for initialization.
      */
     private readonly settings: ISizeChangerSettings;
 

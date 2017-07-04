@@ -3,7 +3,7 @@ import { stub } from "sinon";
 import { ScreenVisibilityToggler } from "../../src/ScreenVisibilityToggler";
 import { it } from "../main";
 
-const createDefaultSettings = () => ({
+const stubSettings = () => ({
     addDocumentPipe: stub(),
     getPaused: stub().returns(false),
     getVisibilityState: stub().returns("visible"),
@@ -13,7 +13,7 @@ const createDefaultSettings = () => ({
 
 it("pauses a playing game when the document hides", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const toggler = new ScreenVisibilityToggler(settings);
 
     settings.getPaused.returns(false);
@@ -28,7 +28,7 @@ it("pauses a playing game when the document hides", () => {
 
 it("doesn't pause a paused game when the document hides", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const toggler = new ScreenVisibilityToggler(settings);
 
     settings.getPaused.returns(true);
@@ -43,7 +43,7 @@ it("doesn't pause a paused game when the document hides", () => {
 
 it("doesn't play a playing game when the document becomes visible", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const toggler = new ScreenVisibilityToggler(settings);
 
     settings.getPaused.returns(false);
@@ -57,7 +57,7 @@ it("doesn't play a playing game when the document becomes visible", () => {
 
 it("doesn't play an externally paused game when the document becomes visible", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const toggler = new ScreenVisibilityToggler(settings);
 
     // Act
@@ -71,7 +71,7 @@ it("doesn't play an externally paused game when the document becomes visible", (
 
 it("plays an intentionally paused game when the document becomes visible", () => {
     // Arrange
-    const settings = createDefaultSettings();
+    const settings = stubSettings();
     const toggler = new ScreenVisibilityToggler(settings);
 
     settings.getPaused.returns(false);
