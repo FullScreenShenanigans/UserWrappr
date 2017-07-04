@@ -29,6 +29,22 @@ export class UserWrappr implements IUserWrappr {
      * Resets event listener pipes.
      */
     public resetEvents(): void {
+        this.settings.addInputPipe(
+            "keydown",
+            this.settings.gameStarter.inputWriter.makePipe("onkeydown", "keyCode"));
+
+        this.settings.addInputPipe(
+            "keyup",
+            this.settings.gameStarter.inputWriter.makePipe("onkeyup", "keyCode"));
+
+        this.settings.addInputPipe(
+            "mousedown",
+            this.settings.gameStarter.inputWriter.makePipe("onmousedown", "which"));
+
+        this.settings.addInputPipe(
+            "contextmenu",
+            this.settings.gameStarter.inputWriter.makePipe("oncontextmenu", "", true));
+
         this.settings.addDocumentPipe(
             "visibilitychange",
             (): void => this.screenVisibilityToggler.toggle());

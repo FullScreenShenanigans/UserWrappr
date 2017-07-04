@@ -1,7 +1,7 @@
 import { IPipe } from "inputwritr/lib/IInputWritr";
 
 /**
- * Adds a document event listener to an InputWritr pipe.
+ * Pipes a document event listener to an InputWritr pipe.
  *
  * @param type   Type of the event.
  * @param pipe   InputWritr pipe to receive the listener's events.
@@ -40,6 +40,9 @@ export interface IScreenVisibilityTogglerSettings {
     play(): void;
 }
 
+/**
+ * Toggles GameStartr gameplay on screen visibility.
+ */
 export class ScreenVisibilityToggler {
     /**
      * Whether the page is hidden due to the game being paused.
