@@ -1,5 +1,6 @@
 import { GameStartr } from "gameStartr/lib/GameStartr";
 import { IPipe } from "inputwritr/lib/IInputWritr";
+import { IGamepadPollerSettings } from "./GamepadPoller";
 import { IScreenVisibilityTogglerSettings } from "./ScreenVisibilityToggler";
 import { ISizeSummaries, ISizeSummary } from "./SizeChanger";
 
@@ -16,7 +17,7 @@ export interface IAddInputPipe {
 /**
  * Settings to initialize a new IUserWrappr.
  */
-export interface IUserWrapprSettings extends IScreenVisibilityTogglerSettings {
+export interface IUserWrapprSettings extends IGamepadPollerSettings, IScreenVisibilityTogglerSettings {
     /**
      * Pipes an input event listener to an InputWritr pipe.
      */

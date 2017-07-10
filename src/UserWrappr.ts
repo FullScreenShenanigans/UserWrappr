@@ -1,3 +1,4 @@
+import { GamepadPoller } from "./GamepadPoller";
 import { IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
 import { ScreenVisibilityToggler } from "./ScreenVisibilityToggler";
 import { ISizeSummary, SizeChanger } from "./SizeChanger";
@@ -6,6 +7,11 @@ import { ISizeSummary, SizeChanger } from "./SizeChanger";
  * A user interface wrapper for configurable HTML displays over GameStartr games.
  */
 export class UserWrappr implements IUserWrappr {
+    /**
+     * Polls gamepad state for a GameStartr's DeviceLayr.
+     */
+    private readonly gamepadPoller: GamepadPoller;
+
     /**
      * Settings used for initialization.
      */
@@ -28,13 +34,17 @@ export class UserWrappr implements IUserWrappr {
      */
     public constructor(settings: IUserWrapprSettings) {
         this.settings = settings;
+
+        this.gamepadPoller = new GamepadPoller(this.settings);
         this.screenVisibilityToggler = new ScreenVisibilityToggler(this.settings);
         this.sizeChanger = new SizeChanger({
             ...settings,
-            onReset: (size: ISizeSummary) => {
+            onReset: (size: ISizeSummary): void => {
                 this.settings.gameStarter.reset(size);
             }
         });
+
+        this.resetEvents();
     }
 
     /**
