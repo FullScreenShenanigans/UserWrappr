@@ -1,22 +1,27 @@
 
 /**
- * How wide and tall a GameStartr should be sized.
+ * How wide and tall an IUserWrappr's contained GameStartr should be sized.
  */
 export interface ISizeSummary {
+    /**
+     * How wide the contained GameStartr should be, as a standard Number or Infinity.
+     */
+    width: number;
+
+    /**
+     * How tall the contained GameStartr should be, as a standard Number or Infinity.
+     */
+    height: number;
+
     /**
      * Whether the contained GameStartr should request full screen size.
      */
     full?: boolean;
 
     /**
-     * How tall the contained GameStartr should be, as a standard number or Infinity.
+     * What this size summary should be referred to, if not its key in the container.
      */
-    height: number;
-
-    /**
-     * How wide the contained GameStartr should be, as a standard Nnmber or Infinity.
-     */
-    width: number;
+    name?: string;
 }
 
 /**

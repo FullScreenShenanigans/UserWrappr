@@ -1,5 +1,5 @@
-import { GameStartr } from "gameStartr/lib/GameStartr";
 import { IPipe } from "inputwritr/lib/IInputWritr";
+import { IRootOptionsDisplayerSettings } from "./Displayers/RootOptionsDisplayer";
 import { IGamepadPollerSettings } from "./GamepadPoller";
 import { IScreenVisibilityTogglerSettings } from "./ScreenVisibilityToggler";
 import { ISizeSummaries, ISizeSummary } from "./SizeChanger";
@@ -17,7 +17,7 @@ export interface IAddInputPipe {
 /**
  * Settings to initialize a new IUserWrappr.
  */
-export interface IUserWrapprSettings extends IGamepadPollerSettings, IScreenVisibilityTogglerSettings {
+export interface IUserWrapprSettings extends IGamepadPollerSettings, IRootOptionsDisplayerSettings, IScreenVisibilityTogglerSettings {
     /**
      * Pipes an input event listener to an InputWritr pipe.
      */
@@ -27,11 +27,6 @@ export interface IUserWrapprSettings extends IGamepadPollerSettings, IScreenVisi
      * Closes any full screen state.
      */
     cancelFullScreen: () => void;
-
-    /**
-     * GameStartr instance being wrapped around.
-     */
-    gameStarter: GameStartr;
 
     /**
      * Requests to start a full screen state.
@@ -48,6 +43,11 @@ export interface IUserWrapprSettings extends IGamepadPollerSettings, IScreenVisi
  * A user interface wrapper for configurable HTML displays over GameStartr games.
  */
 export interface IUserWrappr {
+    /**
+     * Resets the visual aspect of the controls.
+     */
+    resetControls(): void;
+
     /**
      * Resets event listener pipes.
      */

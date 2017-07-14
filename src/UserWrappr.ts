@@ -1,3 +1,4 @@
+import { RootOptionsDisplayer } from "./displayers/RootOptionsDisplayer";
 import { GamepadPoller } from "./GamepadPoller";
 import { IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
 import { ScreenVisibilityToggler } from "./ScreenVisibilityToggler";
@@ -11,6 +12,11 @@ export class UserWrappr implements IUserWrappr {
      * Polls gamepad state for a GameStartr's DeviceLayr.
      */
     private readonly gamepadPoller: GamepadPoller;
+
+    /**
+     * Displays options for the game.
+     */
+    private readonly rootOptionsDisplayer: RootOptionsDisplayer;
 
     /**
      * Settings used for initialization.
@@ -43,8 +49,22 @@ export class UserWrappr implements IUserWrappr {
                 this.settings.gameStarter.reset(size);
             }
         });
+        this.rootOptionsDisplayer = new RootOptionsDisplayer(settings);
 
         this.resetEvents();
+
+        this.settings.setTimeout(
+            (): void => {
+                this.resetControls();
+            },
+            0);
+    }
+
+    /**
+     * Resets the visual aspect of the controls.
+     */
+    public resetControls(): void {
+        this.rootOptionsDisplayer.resetControls();
     }
 
     /**
