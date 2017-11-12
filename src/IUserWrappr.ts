@@ -1,126 +1,52 @@
-import { GameStartr } from "gamestartr/lib/GameStartr";
-
-import { ISchema } from "./UISchemas";
-
-export interface IHTMLElement extends HTMLElement {
-    requestFullScreen: () => void;
-    webkitRequestFullScreen: () => void;
-    mozRequestFullScreen: () => void;
-    msRequestFullscreen: () => void;
-    webkitFullscreenElement: () => void;
-    cancelFullScreen: () => void;
-    webkitCancelFullScreen: () => void;
-    mozCancelFullScreen: () => void;
-    msCancelFullScreen: () => void;
+/**
+ * 
+ */
+export enum LoadingStatus {
+    Complete,
+    InProgress,
+    NotStarted
 }
 
-export interface IEvent {
-    target: HTMLElement;
+export interface ILoadMeasurement {
+    timeSpent: number;
+}
+
+export interface IInitializationStatus extends ILoadMeasurement {
+    loadingStatus: LoadingStatus;
 }
 
 /**
- * Generator for a user-facing HTML control.
- *
- * @param schema   A general description of the control to create.
- * @returns An HTML element as described by the schema.
+ * 
  */
-export interface IOptionsGenerator {
-    generate: (schema: ISchema) => HTMLDivElement;
+export type ILoadResult<TResult = void> = IFailedLoad | ISuccessfulLoad<TResult>;
+
+/**
+ * 
+ */
+export interface IFailedLoad extends ILoadMeasurement {
+    error: any;
+    succeeded: false;
 }
 
 /**
- * Options generators, keyed by name.
+ * 
  */
-export interface IOptionsGenerators {
-    [i: string]: IOptionsGenerator;
-}
-
-/**
- * How wide and tall an IUserWrappr's contained GameStartr should be sized.
- */
-export interface ISizeSummary {
-    /**
-     * How wide the contained GameStartr should be, as a standard Number or Infinity.
-     */
-    width: number;
-
-    /**
-     * How tall the contained GameStartr should be, as a standard Number or Infinity.
-     */
-    height: number;
-
-    /**
-     * Whether the contained GameStartr should request full screen size.
-     */
-    full?: boolean;
-
-    /**
-     * What this size summary should be referred to, if not its key in the container.
-     */
-    name?: string;
-}
-
-/**
- * Size summaries keyed by name.
- */
-export interface ISizeSummaries {
-    [i: string]: ISizeSummary;
+export interface ISuccessfulLoad<TResult> extends ILoadMeasurement {
+    result: TResult;
+    succeeded: true;
 }
 
 /**
  * Settings to initialize a new IUserWrappr.
  */
 export interface IUserWrapprSettings {
-    /**
-     * The GameStartr instance being wrapped.
-     */
-    gameStarter: GameStartr;
-
-    /**
-     * Schemas for each UI control to be made.
-     */
-    schemas?: ISchema[];
-
-    /**
-     * Allowed sizes for the game.
-     */
-    sizes?: ISizeSummaries;
-
-    /**
-     * The default starting size.
-     */
-    sizeDefault: string;
+    loadLibraries(): Promise<ILoadResult>;
 }
 
 /**
- * A user interface wrapper for configurable HTML displays over GameStartr games.
+ * Creates configurable HTML displays over GameStartr games.
  */
 export interface IUserWrappr {
-    /**
-     * The GameStartr instance being wrapped.
-     */
-    getGameStarter(): GameStartr;
-
-    /**
-     * @returns Allowed sizes for the GameStartr.
-     */
-    getSizes(): ISizeSummaries;
-
-    /**
-     * @returns The current GameStartr size.
-     */
-    getSize(): ISizeSummary;
-
-    /**
-     * Resets the GameStartr to the given size.
-     *
-     * @param size The size to set, as either its name or settings.
-     */
-    setSize(size: string | ISizeSummary): void;
-
-    /**
-     * Resets the visual aspect of the controls so they are updated with the
-     * recently changed values in ItemsHolder.
-     */
-    resetControls(): void;
+    getStatus(): IInitializationStatus;
+    initialize(): Promise<ILoadResult<TWhatevertehfuckitscalled>>;
 }
