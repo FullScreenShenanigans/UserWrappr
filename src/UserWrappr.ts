@@ -52,7 +52,7 @@ export class UserWrappr {
         await this.require(externalViewLibraries);
 
         const [viewLogic]: [ICreateWrappingView] = await this.require<[ICreateWrappingView]>([
-            this.settings.delayedScripts
+            this.settings.menuInitializer
         ]);
 
         return viewLogic;

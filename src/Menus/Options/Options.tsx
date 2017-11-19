@@ -13,7 +13,7 @@ import { UnknownOption } from "./UnknownOption";
 
 type IOptionRenderer = (
     | React.ComponentClass
-    | (({ store: OptionStore }) => JSX.Element)
+    | (({ store }: { store: OptionStore }) => JSX.Element)
 );
 
 const storeRenderers = new Map<OptionType, IOptionRenderer>([

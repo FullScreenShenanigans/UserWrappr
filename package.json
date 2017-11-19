@@ -35,7 +35,23 @@
     "test": "gulp test"
   },
   "shenanigans": {
-    "name": "UserWrappr",
+    "entries": [
+      {
+        "entry": "./src/UserWrappr.js",
+        "name": "UserWrappr",
+        "sources": [
+          "src/**/*.js",
+          "!src/Menus/**/*.js"
+        ]
+      },
+      {
+        "entry": "./src/Menus/Menus.js",
+        "name": "UserWrappr-Delayed",
+        "sources": [
+          "src/Menus/**/*.js"
+        ]
+      }
+    ],
     "externals": [
       {
         "js": {
@@ -43,7 +59,29 @@
           "prod": "../node_modules/mobx/lib/mobx.umd.min"
         },
         "name": "mobx"
+      },
+      {
+        "js": {
+          "dev": "../node_modules/mobx-react/index",
+          "prod": "../node_modules/mobx-react/index.min"
+        },
+        "name": "mobx-react"
+      },
+      {
+        "js": {
+          "dev": "../node_modules/react/umd/react.development",
+          "prod": "../node_modules/react/lib/react.production"
+        },
+        "name": "react"
+      },
+      {
+        "js": {
+          "dev": "../node_modules/react-dom/umd/react-dom.development",
+          "prod": "../node_modules/react-dom/lib/react-dom.production"
+        },
+        "name": "react-dom"
       }
-    ]
+    ],
+    "name": "UserWrappr"
   }
 }

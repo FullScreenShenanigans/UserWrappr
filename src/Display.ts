@@ -1,4 +1,5 @@
-import { IMenuBinderDependencies, MenuBinder } from "./MenuBinding/MenuBinder";
+import { ICreateElement } from "./Elements/createElement";
+import { IMenuClassNames, MenuBinder } from "./MenuBinding/MenuBinder";
 import { MenuBinderFactory } from "./MenuBinding/MenuBinderFactory";
 import { IMenu } from "./Menus/Menus";
 import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
@@ -57,11 +58,16 @@ export type ICreateWrappingView = (dependencies: IWrappingViewDependencies) => P
 /**
  * Dependencies to initialize a new Display.
  */
-export interface IDisplayDependencies extends IMenuBinderDependencies {
+export interface IDisplayDependencies {
     /**
      * Container that will contain the contents and menus.
      */
     container: HTMLElement;
+
+    /**
+     * Creates a new HTML element.
+     */
+    createElement: ICreateElement;
 
     /**
      * Creates contents within a container.
@@ -72,6 +78,11 @@ export interface IDisplayDependencies extends IMenuBinderDependencies {
      * Gets the rectangular size of the window.
      */
     getWindowSize: IGetWindowSize;
+
+    /**
+     * Class names to use for menu area elements.
+     */
+    menuClassNames: IMenuClassNames;
 
     /**
      * Menus to create inside of the view.

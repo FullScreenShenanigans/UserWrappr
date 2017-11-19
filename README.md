@@ -12,6 +12,16 @@ Creates configurable HTML displays over fixed size contents.
 (code samples and such)
 ```
 
+### Menu Initializer
+
+External libraries including MobX and React are delay-loaded to preserve optimal performance.
+UserWrappr scripts that depend on them are therefore also delay-loaded.
+`menuInitializer` specifies the RequireJS path to load those scripts.
+
+### Menu Schemas
+
+...
+
 ## Details
 
 UserWrappr prioritizes creating the contents as soon as possible.

@@ -1,8 +1,10 @@
-import { Display, ICreateContents, IDisplayDependencies, IGetWindowSize } from "./Display";
+import { Display, ICreateContents, IGetWindowSize } from "./Display";
+import { ICreateElement } from "./Elements/createElement";
+import { IMenuClassNames } from "./MenuBinding/MenuBinder";
 import { IMenu } from "./Menus/Menus";
 import { IRelativeSizeSchema } from "./Sizing";
 
-export { ICreateContents, IDisplayDependencies, IGetWindowSize } from "./Display";
+export { ICreateContents, IGetWindowSize } from "./Display";
 export { IRelativeSizeSchema } from "./Sizing";
 
 /**
@@ -24,7 +26,7 @@ export type IRequireJs = (modules: string[], onComplete: Function, onError: Func
 /**
  * Settings to initialize a new IUserWrappr.
  */
-export interface IUserWrapprSettings extends IDisplayDependencies {
+export interface IUserWrapprSettings {
     /**
      * HTML element to create a view within.
      */
@@ -36,9 +38,9 @@ export interface IUserWrapprSettings extends IDisplayDependencies {
     createContents: ICreateContents;
 
     /**
-     * Require paths to delayed UserWrappr scripts.
+     * Creates a new HTML element.
      */
-    delayedScripts: string;
+    createElement: ICreateElement;
 
     /**
      * Initial size to create a container at.
@@ -49,6 +51,16 @@ export interface IUserWrapprSettings extends IDisplayDependencies {
      * Gets the rectangular size of the window.
      */
     getWindowSize: IGetWindowSize;
+
+    /**
+     * Class names to use for menu area elements.
+     */
+    menuClassNames: IMenuClassNames;
+
+    /**
+     * Require path to the menu initialization script.
+     */
+    menuInitializer: string;
 
     /**
      * Menus to create inside of the container.
