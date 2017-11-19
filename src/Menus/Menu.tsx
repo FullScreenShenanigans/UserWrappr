@@ -6,11 +6,9 @@ import { MenuStore, VisualState } from "./MenuStore";
 // TODO: Instead of using class names, use inline styles and react-transition-group
 
 export const Menu = observer(({ children, store }: { children?: React.ReactNode; store: MenuStore }) => (
-    <div className={`menu menu-${VisualState[store.visualState]}`}>
-        <div className="menu-child">
-            {children}
-        </div>
-        <div className="menu-title">
+    <div className={`${store.classNames.menu} ${store.classNames.menu}-${VisualState[store.visualState]}`}>
+        {children}
+        <div className={store.classNames.menuTitle}>
             {store.title}
         </div>
     </div>

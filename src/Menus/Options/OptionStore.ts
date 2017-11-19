@@ -14,7 +14,7 @@ export abstract class OptionStore<TSchema extends IBasicSchema = IBasicSchema> {
     /**
      * Initializes a new instance of the OptionStore class.
      *
-     * @param schema   Schema for the saveable value.
+     * @param schema   Schema for the option.
      */
     public constructor(schema: TSchema) {
         this.schema = schema;

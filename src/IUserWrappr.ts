@@ -1,7 +1,7 @@
-import { Display, ICreateContents, IGetWindowSize } from "./Display";
+import { Display, IClassNames, ICreateContents, IGetWindowSize } from "./Display";
 import { ICreateElement } from "./Elements/createElement";
-import { IMenuClassNames } from "./MenuBinding/MenuBinder";
 import { IMenu } from "./Menus/Menus";
+import { ISetTimeout } from "./Menus/MenuStore";
 import { IRelativeSizeSchema } from "./Sizing";
 
 export { ICreateContents, IGetWindowSize } from "./Display";
@@ -28,6 +28,11 @@ export type IRequireJs = (modules: string[], onComplete: Function, onError: Func
  */
 export interface IUserWrapprSettings {
     /**
+     * Class names to use for display elements.
+     */
+    classNames: IClassNames;
+
+    /**
      * HTML element to create a view within.
      */
     container: HTMLElement;
@@ -53,11 +58,6 @@ export interface IUserWrapprSettings {
     getWindowSize: IGetWindowSize;
 
     /**
-     * Class names to use for menu area elements.
-     */
-    menuClassNames: IMenuClassNames;
-
-    /**
      * Require path to the menu initialization script.
      */
     menuInitializer: string;
@@ -66,6 +66,16 @@ export interface IUserWrapprSettings {
      * Menus to create inside of the container.
      */
     menus: IMenu[];
+
+    /**
+     * Waits before calling an action.
+     */
+    setTimeout: ISetTimeout;
+
+    /**
+     * How long to transition between visual states.
+     */
+    transitionTime: number;
 
     /**
      * Loads external scripts.

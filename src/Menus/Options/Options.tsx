@@ -30,15 +30,11 @@ const renderOptionStore = (store: OptionStore) => {
         Renderer = UnknownOption;
     }
 
-    return (
-        <div className="option">
-            <Renderer store={store} key={store.schema.title} />
-        </div>
-    );
+    return <Renderer store={store} key={store.schema.title} />;
 };
 
 export const Options = observer(({ store }: { store: OptionsStore }) => (
-    <div className="options">
+    <div className={store.classNames.options}>
         {store.children.map(renderOptionStore)}
     </div>
 ));

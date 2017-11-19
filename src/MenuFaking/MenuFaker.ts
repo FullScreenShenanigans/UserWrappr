@@ -1,26 +1,12 @@
-import { ICreateWrappingView } from "../Display";
+import { IClassNames } from "../Display";
 import { ICreateElement } from "../Elements/createElement";
 import { IMenu } from "../Menus/Menus";
 import { IAbsoluteSizeSchema } from "../Sizing";
 
 /**
- * Class names to use for menu area elements.
+ * Dependencies to initialize a new MenuFaker.
  */
-export interface IMenuClassNames {
-    /**
-     * Class name for the surrounding area div.
-     */
-    area: string;
-
-    /**
-     * Class name for each menu title.
-     */
-    title: string;
-}
-/**
- * Dependencies to initialize a new MenuBinder.
- */
-export interface IMenuBinderDependencies {
+export interface IMenuFakerDependencies {
     /**
      * Container that will contain the contents and menus.
      */
@@ -37,9 +23,9 @@ export interface IMenuBinderDependencies {
     createElement: ICreateElement;
 
     /**
-     * Class names to use for menu area elements.
+     * Class names to use for display elements.
      */
-    menuClassNames: IMenuClassNames;
+    classNames: IClassNames;
 
     /**
      * Menus to create inside of the container.
@@ -48,20 +34,20 @@ export interface IMenuBinderDependencies {
 }
 
 /**
- * Creates placeholder menu titles and binds them to real menus.
+ * Creates placeholder menu titles before a real menu is created.
  */
-export class MenuBinder {
+export class MenuFaker {
     /**
      * Dependencies used for initialization.
      */
-    private readonly dependencies: IMenuBinderDependencies;
+    private readonly dependencies: IMenuFakerDependencies;
 
     /**
-     * Initializes a new instance of the MenuBinder class.
+     * Initializes a new instance of the MenuFaker class.
      *
      * @param dependencies   Dependencies to be used for initialization.
      */
-    public constructor(dependencies: IMenuBinderDependencies) {
+    public constructor(dependencies: IMenuFakerDependencies) {
         this.dependencies = dependencies;
     }
 
@@ -70,7 +56,7 @@ export class MenuBinder {
      *
      * @returns A Promise for the remaining usable space within the container.
      */
-    public async createTitleArea(): Promise<IAbsoluteSizeSchema> {
+    public async fakeMenuArea(): Promise<IAbsoluteSizeSchema> {
         const area = this.createAreaWithMenuTitles();
         this.dependencies.container.appendChild(area);
 
@@ -82,33 +68,33 @@ export class MenuBinder {
         };
     }
 
-    public async bindMenuTitles(createWrappingView: ICreateWrappingView): Promise<void> {
-        // todo: this
-        await Promise.resolve(createWrappingView);
-    }
-
     /**
      * Creates an area with titles for each menu.
      *
      * @returns An area with titles for each menu.
      */
     private createAreaWithMenuTitles(): HTMLElement {
-        const area = this.dependencies.createElement("div", {
-            className: this.dependencies.menuClassNames.area
+        const innerArea = this.dependencies.createElement("div", {
+            className: this.dependencies.classNames.innerArea
+        });
+        const outerArea = this.dependencies.createElement("div", {
+            className: this.dependencies.classNames.outerArea,
+            children: [innerArea]
         });
 
         for (const menu of this.dependencies.menus) {
-            area.appendChild(
+            innerArea.appendChild(
                 this.dependencies.createElement("div", {
+                    className: this.dependencies.classNames.menu,
                     children: [
-                        this.dependencies.createElement("span", {
+                        this.dependencies.createElement("div", {
+                            className: this.dependencies.classNames.menuTitle,
                             textContent: menu.title
                         })
-                    ],
-                    className: this.dependencies.menuClassNames.title
+                    ]
                 }));
         }
 
-        return area;
+        return outerArea;
     }
 }

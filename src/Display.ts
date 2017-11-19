@@ -1,8 +1,38 @@
 import { ICreateElement } from "./Elements/createElement";
-import { IMenuClassNames, MenuBinder } from "./MenuBinding/MenuBinder";
-import { MenuBinderFactory } from "./MenuBinding/MenuBinderFactory";
+import { MenuFakerFactory } from "./MenuFaking/MenuFakerFactory";
 import { IMenu } from "./Menus/Menus";
+import { IMenusStoreDependencies } from "./Menus/MenusStore";
 import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
+
+/**
+ * Class names to use for display elements.
+ */
+export interface IClassNames {
+    /**
+     * Class name for the inner area div.
+     */
+    innerArea: string;
+
+    /**
+     * Class name for each options list div.
+     */
+    options: string;
+
+    /**
+     * Class name for the surrounding area div.
+     */
+    outerArea: string;
+
+    /**
+     * Class name for each menu's div.
+     */
+    menu: string;
+
+    /**
+     * Class name for each menu title div.
+     */
+    menuTitle: string;
+}
 
 /**
  * Creates contents for a size.
@@ -30,35 +60,22 @@ export type ISetSize = (size: IRelativeSizeSchema) => Promise<void>;
 /**
  * Dependencies to create a wrapping view in an element.
  */
-export interface IWrappingViewDependencies {
+export interface IWrappingViewDependencies extends IMenusStoreDependencies {
     /**
      * Element to create a view within.
      */
     container: HTMLElement;
-
-    /**
-     * Menus to create inside of the container.
-     */
-    menus: IMenu[];
-
-    /**
-     * Hook to reset contents to the wrapping size.
-     */
-    setSize: ISetSize;
 }
-
-/**
- * Creates a wrapping contents view in a container.
- *
- * @param container   Container to create a view within.
- * @param schema   Descriptions of menu options.
- */
-export type ICreateWrappingView = (dependencies: IWrappingViewDependencies) => Promise<void>;
 
 /**
  * Dependencies to initialize a new Display.
  */
 export interface IDisplayDependencies {
+    /**
+     * Class names to use for display elements.
+     */
+    classNames: IClassNames;
+
     /**
      * Container that will contain the contents and menus.
      */
@@ -80,11 +97,6 @@ export interface IDisplayDependencies {
     getWindowSize: IGetWindowSize;
 
     /**
-     * Class names to use for menu area elements.
-     */
-    menuClassNames: IMenuClassNames;
-
-    /**
      * Menus to create inside of the view.
      */
     menus: IMenu[];
@@ -100,9 +112,9 @@ export class Display {
     private readonly dependencies: IDisplayDependencies;
 
     /**
-     * Creates MenuBinders for containers.
+     * Creates MenuFakers for containers.
      */
-    private readonly menuBinderFactory: MenuBinderFactory;
+    private readonly MenuFakerFactory: MenuFakerFactory;
 
     /**
      * Initializes a new instance of the Display class.
@@ -111,23 +123,21 @@ export class Display {
      */
     public constructor(dependencies: IDisplayDependencies) {
         this.dependencies = dependencies;
-        this.menuBinderFactory = new MenuBinderFactory(dependencies);
+        this.MenuFakerFactory = new MenuFakerFactory(dependencies);
     }
 
     /**
      * Resets the internal contents to a new size.
      *
      * @param requestedSize   New size of the contents.
-     * @returns A Promise for a MenuBinder for the requested size.
+     * @returns A Promise for a MenuFaker for the requested size.
      */
-    public resetContents = async (requestedSize: IRelativeSizeSchema): Promise<MenuBinder> => {
+    public resetContents = async (requestedSize: IRelativeSizeSchema): Promise<void> => {
         const windowSize: IAbsoluteSizeSchema = this.dependencies.getWindowSize();
         const containerSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(windowSize, requestedSize);
-        const menuBinder = this.menuBinderFactory.createForSize(containerSize);
-        const contentSize: IAbsoluteSizeSchema = await menuBinder.createTitleArea();
+        const menuFaker = this.MenuFakerFactory.createForSize(containerSize);
+        const contentSize: IAbsoluteSizeSchema = await menuFaker.fakeMenuArea();
 
         this.dependencies.createContents(this.dependencies.container, contentSize);
-
-        return menuBinder;
     }
 }

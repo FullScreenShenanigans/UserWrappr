@@ -1,7 +1,9 @@
 import * as React from "react";
 
 import { IOptionSchema } from "../../src/Menus/Options/OptionSchemas";
-import { ISetSize } from "../Display";
+import { Menu } from "./Menu";
+import { IMenuAndOptionsListStores, MenusStore } from "./MenusStore";
+import { Options } from "./Options/Options";
 
 /**
  * Schema for a menu containing options.
@@ -18,21 +20,14 @@ export interface IMenu {
     title: string;
 }
 
-/**
- * Props for a Menus component.
- */
-export interface IMenusProps {
-    /**
-     * Menu schemas to render.
-     */
-    menus: IMenu[];
+export class Menus extends React.Component<{ store: MenusStore }> {
+    public render() {
+        return this.props.store.menuAndOptionListStores.map(this.renderMenuAndOptionsList);
+    }
 
-    /**
-     * Hook to reset contents to a size.
-     */
-    setSize: ISetSize;
+    private renderMenuAndOptionsList = (stores: IMenuAndOptionsListStores, key: number) => (
+        <Menu store={stores.menu}>
+            <Options key={key} store={stores.options} />
+        </Menu>
+    )
 }
-
-export const Menus = (props: IMenusProps) => {
-    return <span>{JSON.stringify(props)}</span>;
-};

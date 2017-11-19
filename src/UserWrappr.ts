@@ -1,6 +1,7 @@
-import { Display, ICreateWrappingView } from "./Display";
+import { Display } from "./Display";
 import { IUserWrapprSettings } from "./IUserWrappr";
-import { MenuBinder } from "./MenuBinding/MenuBinder";
+import { IInitializeMenusView, IInitializeMenusViewWrapper } from "./Menus/InitializeMenus";
+import { IRelativeSizeSchema } from "./Sizing";
 
 /**
  * View libraries required to initialize a wrapping display.
@@ -33,12 +34,23 @@ export class UserWrappr {
      * @returns A Promise for a Display wrapper around contents and their view.
      */
     public async createDisplay(): Promise<Display> {
-        const viewLibrariesLoad: Promise<ICreateWrappingView> = this.loadViewLibraries();
-        const display: Display = new Display(this.settings);
-        const menuBinder: MenuBinder = await display.resetContents(this.settings.defaultSize);
-        const createWrappingView: ICreateWrappingView = await viewLibrariesLoad;
+        const viewLibrariesLoad: Promise<IInitializeMenusView> = this.loadViewLibraries();
 
-        await menuBinder.bindMenuTitles(createWrappingView);
+        const display: Display = new Display(this.settings);
+        await display.resetContents(this.settings.defaultSize);
+
+        const initializeMenusView: IInitializeMenusView = await viewLibrariesLoad;
+
+        await initializeMenusView({
+            classNames: this.settings.classNames,
+            container: this.settings.container,
+            menus: this.settings.menus,
+            setSize: async (size: IRelativeSizeSchema): Promise<void> => {
+                throw new Error(`Not implemented yet! (should take in size ${JSON.stringify(size)}.`);
+            },
+            setTimeout: this.settings.setTimeout,
+            transitionTime: this.settings.transitionTime
+        });
 
         return display;
     }
@@ -48,14 +60,14 @@ export class UserWrappr {
      *
      * @returns A Promise for a method to create a wrapping game view in a container.
      */
-    private async loadViewLibraries(): Promise<ICreateWrappingView> {
+    private async loadViewLibraries(): Promise<IInitializeMenusView> {
         await this.require(externalViewLibraries);
 
-        const [viewLogic]: [ICreateWrappingView] = await this.require<[ICreateWrappingView]>([
+        const wrapperModule: IInitializeMenusViewWrapper = await this.require<IInitializeMenusViewWrapper>([
             this.settings.menuInitializer
         ]);
 
-        return viewLogic;
+        return wrapperModule.initializeMenus;
     }
 
     /**
@@ -64,7 +76,7 @@ export class UserWrappr {
      * @param modules   Module identifiers of the scripts.
      * @returns Required contents of the scripts.
      */
-    private async require<TResults extends {}[]>(modules: string[]): Promise<TResults> {
+    private async require<TResults>(modules: string[]): Promise<TResults> {
         return new Promise<TResults>((resolve, reject) => {
             requirejs(modules, resolve, reject);
         });

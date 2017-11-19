@@ -1,4 +1,5 @@
-import { action, computed } from "mobx";
+import { action } from "mobx";
+import { IClassNames } from "../Display";
 
 /**
  * How a menu should visually behave.
@@ -44,6 +45,11 @@ export type ISetTimeout = (action: () => void, delay: number) => number;
  */
 export interface IMenuStoreDependencies {
     /**
+     * Class names to use for display elements.
+     */
+    classNames: IClassNames;
+
+    /**
      * Waits before calling an action.
      */
     setTimeout: ISetTimeout;
@@ -83,9 +89,15 @@ export class MenuStore {
     }
 
     /**
+     * Class names to use for display elements.
+     */
+    public get classNames(): IClassNames {
+        return this.dependencies.classNames;
+    }
+
+    /**
      * Section title of the menu.
      */
-    @computed
     public get title(): string {
         return this.dependencies.title;
     }
@@ -93,7 +105,6 @@ export class MenuStore {
     /**
      * How the menu should visually behave.
      */
-    @computed
     public get visualState(): VisualState {
         return this.state;
     }

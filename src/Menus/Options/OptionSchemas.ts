@@ -8,6 +8,7 @@ export type IOptionSchema = (
     | INumberSchema
     | ISelectSchema
     | IStringSchema
+    | IUnknownSchema
 );
 
 /**
@@ -37,7 +38,12 @@ export const enum OptionType {
     /**
      * Any string value.
      */
-    String = "string"
+    String = "string",
+
+    /**
+     * Unknown or unsupported value.
+     */
+    Unknown = "unknown"
 }
 
 /**
@@ -144,17 +150,9 @@ export interface IStringSchema extends ISaveableSchema<string> {
     type: OptionType.String;
 }
 
-/**
- * Store for an option.
- */
-export interface IOptionStore {
+export interface IUnknownSchema extends IBasicSchema {
     /**
-     * Displayed title of the option.
+     * Type of the option (unknown).
      */
-    readonly title: string;
-
-    /**
-     * Type of the option.
-     */
-    readonly type: OptionType;
+    type: OptionType.Unknown;
 }
