@@ -1,5 +1,6 @@
 import { Display, ICreateWrappingView } from "./Display";
 import { IUserWrapprSettings } from "./IUserWrappr";
+import { MenuBinder } from "./MenuBinding/MenuBinder";
 
 /**
  * View libraries required to initialize a wrapping display.
@@ -32,18 +33,12 @@ export class UserWrappr {
      * @returns A Promise for a Display wrapper around contents and their view.
      */
     public async createDisplay(): Promise<Display> {
-        const viewLibrariesLoad = this.loadViewLibraries();
-        const display = new Display({
-            container: this.settings.container,
-            getWindowSize: this.settings.getWindowSize,
-            createContents: this.settings.createContents,
-            menus: this.settings.menus
-        });
+        const viewLibrariesLoad: Promise<ICreateWrappingView> = this.loadViewLibraries();
+        const display: Display = new Display(this.settings);
+        const menuBinder: MenuBinder = await display.resetContents(this.settings.defaultSize);
+        const createWrappingView: ICreateWrappingView = await viewLibrariesLoad;
 
-        await display.resetContents(this.settings.defaultSize);
-
-        const createWrappingView = await viewLibrariesLoad;
-        await display.resetWrappingView(createWrappingView);
+        await menuBinder.bindMenuTitles(createWrappingView);
 
         return display;
     }
@@ -56,7 +51,7 @@ export class UserWrappr {
     private async loadViewLibraries(): Promise<ICreateWrappingView> {
         await this.require(externalViewLibraries);
 
-        const [viewLogic] = await this.require<[ICreateWrappingView]>([
+        const [viewLogic]: [ICreateWrappingView] = await this.require<[ICreateWrappingView]>([
             this.settings.delayedScripts
         ]);
 

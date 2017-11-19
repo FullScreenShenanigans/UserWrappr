@@ -40,7 +40,7 @@ export interface IRelativeSizeSchema {
  * @param relative   User-friendly relative size.
  * @returns The absolute pixel number equivalent for the size.
  */
-export const getAbsoluteSize = (container: number, relative: IRelativeSize): number => {
+const convertRelativeToAbsoluteSize = (container: number, relative: IRelativeSize): number => {
     if (typeof relative === "number") {
         return relative;
     }
@@ -59,7 +59,7 @@ export const getAbsoluteSize = (container: number, relative: IRelativeSize): num
  * @param requestedSize User-friendly relative sizes.
  * @returns The absolute size schema equivalent for the sizes.
  */
-export const getAbsoluteSizeFromSchema = (container: IAbsoluteSizeSchema, requestedSize: IRelativeSizeSchema): IAbsoluteSizeSchema => ({
-    height: getAbsoluteSize(container.height, requestedSize.height),
-    width: getAbsoluteSize(container.width, requestedSize.width)
+export const getAbsoluteSizeInContainer = (container: IAbsoluteSizeSchema, requestedSize: IRelativeSizeSchema): IAbsoluteSizeSchema => ({
+    height: convertRelativeToAbsoluteSize(container.height, requestedSize.height),
+    width: convertRelativeToAbsoluteSize(container.width, requestedSize.width)
 });

@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { getAbsoluteSizeFromSchema, IAbsoluteSizeSchema, IRelativeSizeSchema } from "../../src/Sizing";
+import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } from "../../src/Sizing";
 import { it } from "../main";
 
 it("keeps pixel sizes the same when given pixel sizes", () => {
@@ -15,7 +15,7 @@ it("keeps pixel sizes the same when given pixel sizes", () => {
     };
 
     // Act
-    const absoluteSize: IAbsoluteSizeSchema = getAbsoluteSizeFromSchema(container, requestedSize);
+    const absoluteSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(container, requestedSize);
 
     // Assert
     expect(absoluteSize).to.be.deep.equal(requestedSize);
@@ -33,11 +33,31 @@ it("calculates percentages when given percentage strings", () => {
     };
 
     // Act
-    const absoluteSize: IAbsoluteSizeSchema = getAbsoluteSizeFromSchema(container, requestedSize);
+    const absoluteSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(container, requestedSize);
 
     // Assert
     expect(absoluteSize).to.be.deep.equal({
         height: 245,
         width: 350
     });
+});
+
+it("throws an error for an invalid percentage string", () => {
+    // Arrange
+    const container: IAbsoluteSizeSchema = {
+        height: 490,
+        width: 350
+    };
+    const requestedSize: IRelativeSizeSchema = {
+        height: "50%",
+        width: "invalid%",
+    };
+
+    // Act
+    const action = () => {
+        getAbsoluteSizeInContainer(container, requestedSize);
+    };
+
+    // Assert
+    expect(action).to.throw("Relative size should be in percentage form.");
 });

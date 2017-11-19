@@ -1,4 +1,9 @@
-import { Display } from "./Display";
+import { Display, ICreateContents, IDisplayDependencies, IGetWindowSize } from "./Display";
+import { IMenu } from "./Menus/Menus";
+import { IRelativeSizeSchema } from "./Sizing";
+
+export { ICreateContents, IDisplayDependencies, IGetWindowSize } from "./Display";
+export { IRelativeSizeSchema } from "./Sizing";
 
 /**
  * Loads runtime-required libraries for the wrapped contents.
@@ -19,16 +24,36 @@ export type IRequireJs = (modules: string[], onComplete: Function, onError: Func
 /**
  * Settings to initialize a new IUserWrappr.
  */
-export interface IUserWrapprSettings {
+export interface IUserWrapprSettings extends IDisplayDependencies {
     /**
      * HTML element to create a view within.
      */
     container: HTMLElement;
 
     /**
+     * Creates contents for a size.
+     */
+    createContents: ICreateContents;
+
+    /**
      * Require paths to delayed UserWrappr scripts.
      */
     delayedScripts: string;
+
+    /**
+     * Initial size to create a container at.
+     */
+    defaultSize: IRelativeSizeSchema;
+
+    /**
+     * Gets the rectangular size of the window.
+     */
+    getWindowSize: IGetWindowSize;
+
+    /**
+     * Menus to create inside of the container.
+     */
+    menus: IMenu[];
 
     /**
      * Loads external scripts.

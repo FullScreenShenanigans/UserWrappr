@@ -1,5 +1,7 @@
+import { IMenuBinderDependencies, MenuBinder } from "./MenuBinding/MenuBinder";
+import { MenuBinderFactory } from "./MenuBinding/MenuBinderFactory";
 import { IMenu } from "./Menus/Menus";
-import { getAbsoluteSizeFromSchema, IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
+import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
 
 /**
  * Creates contents for a size.
@@ -34,7 +36,7 @@ export interface IWrappingViewDependencies {
     container: HTMLElement;
 
     /**
-     * Menus to create inside of the element.
+     * Menus to create inside of the container.
      */
     menus: IMenu[];
 
@@ -55,9 +57,9 @@ export type ICreateWrappingView = (dependencies: IWrappingViewDependencies) => P
 /**
  * Dependencies to initialize a new Display.
  */
-export interface IDisplayDependencies {
+export interface IDisplayDependencies extends IMenuBinderDependencies {
     /**
-     * Container that will contain the contents and wrapping view.
+     * Container that will contain the contents and menus.
      */
     container: HTMLElement;
 
@@ -78,7 +80,7 @@ export interface IDisplayDependencies {
 }
 
 /**
- * Contains a wrapping view around contents within a container.
+ * Contains contents and menus within a container.
  */
 export class Display {
     /**
@@ -87,41 +89,34 @@ export class Display {
     private readonly dependencies: IDisplayDependencies;
 
     /**
+     * Creates MenuBinders for containers.
+     */
+    private readonly menuBinderFactory: MenuBinderFactory;
+
+    /**
      * Initializes a new instance of the Display class.
      *
      * @param dependencies   Dependencies to be used for initialization.
      */
     public constructor(dependencies: IDisplayDependencies) {
         this.dependencies = dependencies;
+        this.menuBinderFactory = new MenuBinderFactory(dependencies);
     }
 
     /**
      * Resets the internal contents to a new size.
      *
      * @param requestedSize   New size of the contents.
+     * @returns A Promise for a MenuBinder for the requested size.
      */
-    public resetContents = async (requestedSize: IRelativeSizeSchema): Promise<void> => {
+    public resetContents = async (requestedSize: IRelativeSizeSchema): Promise<MenuBinder> => {
         const windowSize: IAbsoluteSizeSchema = this.dependencies.getWindowSize();
-        const containerSize: IAbsoluteSizeSchema = getAbsoluteSizeFromSchema(windowSize, requestedSize);
-        const contentSize: IAbsoluteSizeSchema = await this.menuLauncher.createTitleArea(
-            this.dependencies.container,
-            this.dependencies.menus,
-            containerSize);
+        const containerSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(windowSize, requestedSize);
+        const menuBinder = this.menuBinderFactory.createForSize(containerSize);
+        const contentSize: IAbsoluteSizeSchema = await menuBinder.createTitleArea();
 
         this.dependencies.createContents(this.dependencies.container, contentSize);
-    }
 
-    /**
-     * Resets the wrapping view around the contents.
-     *
-     * @param createWrappingView   Creates a wrapping view in a container.
-     */
-    public async resetWrappingView(createWrappingView: ICreateWrappingView): Promise<void> {
-        this.menuLauncher.bindMenuTitles({
-            container: this.dependencies.container,
-            createWrappingView,
-            menus: this.dependencies.menus,
-            setSize: this.resetContents
-        });
+        return menuBinder;
     }
 }
