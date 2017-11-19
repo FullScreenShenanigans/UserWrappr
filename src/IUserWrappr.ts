@@ -1,52 +1,49 @@
-/**
- * 
- */
-export enum LoadingStatus {
-    Complete,
-    InProgress,
-    NotStarted
-}
-
-export interface ILoadMeasurement {
-    timeSpent: number;
-}
-
-export interface IInitializationStatus extends ILoadMeasurement {
-    loadingStatus: LoadingStatus;
-}
+import { Display } from "./Display";
 
 /**
- * 
+ * Loads runtime-required libraries for the wrapped contents.
+ *
+ * @returns A Promise for loading the runtime-required libraries.
  */
-export type ILoadResult<TResult = void> = IFailedLoad | ISuccessfulLoad<TResult>;
+export type ILoadContentLibraries = () => Promise<void>;
 
 /**
- * 
+ * Loads external scripts.
+ *
+ * @param modules   Module identifiers of the scripts.
+ * @param onComplete   Handler for load success.
+ * @param onError   Handler for load failure.
  */
-export interface IFailedLoad extends ILoadMeasurement {
-    error: any;
-    succeeded: false;
-}
-
-/**
- * 
- */
-export interface ISuccessfulLoad<TResult> extends ILoadMeasurement {
-    result: TResult;
-    succeeded: true;
-}
+export type IRequireJs = (modules: string[], onComplete: Function, onError: Function) => void;
 
 /**
  * Settings to initialize a new IUserWrappr.
  */
 export interface IUserWrapprSettings {
-    loadLibraries(): Promise<ILoadResult>;
+    /**
+     * HTML element to create a view within.
+     */
+    container: HTMLElement;
+
+    /**
+     * Require paths to delayed UserWrappr scripts.
+     */
+    delayedScripts: string;
+
+    /**
+     * Loads external scripts.
+     */
+    requirejs: IRequireJs;
 }
 
 /**
- * Creates configurable HTML displays over GameStartr games.
+ * Creates configurable HTML displays over fixed size contents.
  */
 export interface IUserWrappr {
-    getStatus(): IInitializationStatus;
-    initialize(): Promise<ILoadResult<TWhatevertehfuckitscalled>>;
+    /**
+     * Initializes a new display and contents.
+     *
+     * @returns A Promise for a Display wrapper around contents and their view.
+     */
+    createDisplay(): Promise<Display>;
 }
