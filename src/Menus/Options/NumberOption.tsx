@@ -18,6 +18,7 @@ export class NumberOption extends React.Component<{ store: SaveableStore<INumber
                         min={this.props.store.schema.min}
                         onChange={this.changeValue}
                         type="number"
+                        value={this.props.store.value}
                     />
                 </div>
             </div>

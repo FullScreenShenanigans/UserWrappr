@@ -63,3 +63,8 @@ export const getAbsoluteSizeInContainer = (container: IAbsoluteSizeSchema, reque
     height: convertRelativeToAbsoluteSize(container.height, requestedSize.height),
     width: convertRelativeToAbsoluteSize(container.width, requestedSize.width)
 });
+
+export const getAbsoluteSizeRemaining = (container: IAbsoluteSizeSchema, removedSize: IAbsoluteSizeSchema): IAbsoluteSizeSchema => ({
+    height: container.height - removedSize.height,
+    width: container.width
+});

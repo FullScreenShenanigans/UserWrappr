@@ -1,38 +1,38 @@
 import { BrowserClock, createClock } from "lolex";
 
 import { createElement } from "../../src/Elements/createElement";
-import { IUserWrappr, IUserWrapprSettings } from "../../src/IUserWrappr";
+import { IOptionalUserWrapprSettings, IRequiredUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "../../src/IUserWrappr";
 import { IAbsoluteSizeSchema } from "../../src/Sizing";
 import { UserWrappr } from "../../src/UserWrappr";
 
-export interface ITestUserWrapprSettings extends IUserWrapprSettings {
-    canvas: HTMLCanvasElement;
+export interface ITestUserWrapprSettings extends IOptionalUserWrapprSettings, IRequiredUserWrapprSettings {
+    contents: Element;
     clock: BrowserClock;
 }
 
 export interface ITestUserWrappr extends ITestUserWrapprSettings {
+    container: HTMLElement;
     userWrapper: IUserWrappr;
 }
 
 const stubUserWrapprSettings = (): ITestUserWrapprSettings => {
-    const canvas = document.createElement("canvas");
+    const contents = document.createElement("canvas");
     const clock = createClock<BrowserClock>();
 
     return {
-        canvas,
+        contents,
         clock,
-        container: document.createElement("div"),
-        createContents: (container: HTMLElement, size: IAbsoluteSizeSchema) => {
-            canvas.height = size.height;
-            canvas.width = size.width;
-            container.appendChild(canvas);
+        createContents: (size: IAbsoluteSizeSchema) => {
+            contents.height = size.height;
+            contents.width = size.width;
+            return contents;
         },
         createElement,
         defaultSize: {
             height: 350,
             width: 490
         },
-        getWindowSize: () => ({
+        getAvailableContainerSize: () => ({
             height: 700,
             width: 840
         }),
@@ -56,7 +56,8 @@ export const stubUserWrappr = (settings: Partial<IUserWrapprSettings> = {}): ITe
         ...stubUserWrapprSettings(),
         ...settings
     };
+    const container = document.createElement("div");
     const userWrapper: IUserWrappr = new UserWrappr(fullSettings);
 
-    return { ...fullSettings, userWrapper };
+    return { ...fullSettings, container, userWrapper };
 };

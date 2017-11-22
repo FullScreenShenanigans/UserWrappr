@@ -1,7 +1,6 @@
 /**
  * Individual option schema within a menu.
  */
-// Todo: IScreenshotSchema, ISizeSchema
 export type IOptionSchema = (
     | IActionSchema
     | IBooleanSchema
@@ -133,6 +132,11 @@ export interface ISelectSchema extends ISaveableSchema<string> {
      * Given preset values.
      */
     options: string[];
+
+    /**
+     * Type of the option (select).
+     */
+    type: OptionType.Select;
 }
 
 /**

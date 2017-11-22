@@ -1,9 +1,18 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { IWrappingViewDependencies } from "../Display";
 import { Menus } from "./Menus";
-import { MenusStore } from "./MenusStore";
+import { IMenusStoreDependencies, MenusStore } from "./MenusStore";
+
+/**
+ * Dependencies to create a wrapping view in an element.
+ */
+export interface IWrappingViewDependencies extends IMenusStoreDependencies {
+    /**
+     * Element to create a view within.
+     */
+    container: HTMLElement;
+}
 
 /**
  * Creates a menus view in a container.

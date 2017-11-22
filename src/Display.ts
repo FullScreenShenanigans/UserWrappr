@@ -1,7 +1,7 @@
+import { AreasFaker } from "./Bootstrapping/AreasFaker";
 import { ICreateElement } from "./Elements/createElement";
-import { MenuFakerFactory } from "./MenuFaking/MenuFakerFactory";
-import { IMenu } from "./Menus/Menus";
-import { IMenusStoreDependencies } from "./Menus/MenusStore";
+import { IGetAvailableContainerSize } from "./Elements/getAvailableContainerSize";
+import { IMenuSchema } from "./Menus/MenuSchemas";
 import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
 
 /**
@@ -37,17 +37,10 @@ export interface IClassNames {
 /**
  * Creates contents for a size.
  *
- * @param container   Container for the contents.
- * @param size   Size to create.
+ * @param size   Bounding size to create contents in.
+ * @returns Contents at the size.
  */
-export type ICreateContents = (container: HTMLElement, size: IAbsoluteSizeSchema) => void;
-
-/**
- * Gets the rectangular size of the window.
- *
- * @returns The rectangular size of the window.
- */
-export type IGetWindowSize = () => IAbsoluteSizeSchema;
+export type ICreateContents = (size: IAbsoluteSizeSchema) => Element;
 
 /**
  * Hook to reset contents to a size.
@@ -56,16 +49,6 @@ export type IGetWindowSize = () => IAbsoluteSizeSchema;
  * @returns A Promise for resetting contents to the size.
  */
 export type ISetSize = (size: IRelativeSizeSchema) => Promise<void>;
-
-/**
- * Dependencies to create a wrapping view in an element.
- */
-export interface IWrappingViewDependencies extends IMenusStoreDependencies {
-    /**
-     * Element to create a view within.
-     */
-    container: HTMLElement;
-}
 
 /**
  * Dependencies to initialize a new Display.
@@ -94,12 +77,12 @@ export interface IDisplayDependencies {
     /**
      * Gets the rectangular size of the window.
      */
-    getWindowSize: IGetWindowSize;
+    getAvailableContainerSize: IGetAvailableContainerSize;
 
     /**
      * Menus to create inside of the view.
      */
-    menus: IMenu[];
+    menus: IMenuSchema[];
 }
 
 /**
@@ -112,9 +95,9 @@ export class Display {
     private readonly dependencies: IDisplayDependencies;
 
     /**
-     * Creates MenuFakers for containers.
+     * Creates placeholder menu titles before a real menu is created.
      */
-    private readonly MenuFakerFactory: MenuFakerFactory;
+    private readonly areasFaker: AreasFaker;
 
     /**
      * Initializes a new instance of the Display class.
@@ -123,21 +106,24 @@ export class Display {
      */
     public constructor(dependencies: IDisplayDependencies) {
         this.dependencies = dependencies;
-        this.MenuFakerFactory = new MenuFakerFactory(dependencies);
+        this.areasFaker = new AreasFaker(this.dependencies);
     }
 
     /**
      * Resets the internal contents to a new size.
      *
      * @param requestedSize   New size of the contents.
-     * @returns A Promise for a MenuFaker for the requested size.
+     * @returns A Promise for a AreasFaker for the requested size.
      */
     public resetContents = async (requestedSize: IRelativeSizeSchema): Promise<void> => {
-        const windowSize: IAbsoluteSizeSchema = this.dependencies.getWindowSize();
-        const containerSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(windowSize, requestedSize);
-        const menuFaker = this.MenuFakerFactory.createForSize(containerSize);
-        const contentSize: IAbsoluteSizeSchema = await menuFaker.fakeMenuArea();
+        const availableContainerSize: IAbsoluteSizeSchema = this.dependencies.getAvailableContainerSize(this.dependencies.container);
+        const containerSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(availableContainerSize, requestedSize);
+        const { menuArea, menuSize } = await this.areasFaker.addMenuArea();
+        const { contentSize, contentArea } = this.areasFaker.createContentArea(containerSize, menuSize);
 
-        this.dependencies.createContents(this.dependencies.container, contentSize);
+        this.dependencies.container.insertBefore(contentArea, menuArea);
+
+        const contents = this.dependencies.createContents(contentSize);
+        contentArea.appendChild(contents);
     }
 }

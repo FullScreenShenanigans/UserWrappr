@@ -13,6 +13,11 @@ export interface IElementProperties {
     className?: string;
 
     /**
+     * Any styles to add to the element.
+     */
+    style?: Partial<CSSStyleDeclaration>;
+
+    /**
      * Text content, if no children.
      */
     textContent?: string;
@@ -38,6 +43,12 @@ export const createElement = (tagName: string, properties: IElementProperties = 
         }
     } else if (properties.textContent !== undefined) {
         element.textContent = properties.textContent;
+    }
+
+    if (properties.style !== undefined) {
+        for (const key in properties.style as any) {
+            (element.style as any)[key] = (properties.style as any)[key];
+        }
     }
 
     return element;

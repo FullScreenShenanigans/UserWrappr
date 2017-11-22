@@ -1,18 +1,9 @@
-import { Display, IClassNames, ICreateContents, IGetWindowSize } from "./Display";
+import { Display, IClassNames, ICreateContents } from "./Display";
 import { ICreateElement } from "./Elements/createElement";
-import { IMenu } from "./Menus/Menus";
+import { IGetAvailableContainerSize } from "./Elements/getAvailableContainerSize";
+import { IMenuSchema } from "./Menus/MenuSchemas";
 import { ISetTimeout } from "./Menus/MenuStore";
 import { IRelativeSizeSchema } from "./Sizing";
-
-export { ICreateContents, IGetWindowSize } from "./Display";
-export { IRelativeSizeSchema } from "./Sizing";
-
-/**
- * Loads runtime-required libraries for the wrapped contents.
- *
- * @returns A Promise for loading the runtime-required libraries.
- */
-export type ILoadContentLibraries = () => Promise<void>;
 
 /**
  * Loads external scripts.
@@ -24,23 +15,13 @@ export type ILoadContentLibraries = () => Promise<void>;
 export type IRequireJs = (modules: string[], onComplete: Function, onError: Function) => void;
 
 /**
- * Settings to initialize a new IUserWrappr.
+ * Optional settings to initialize a new IUserWrappr.
  */
-export interface IUserWrapprSettings {
+export interface IOptionalUserWrapprSettings {
     /**
      * Class names to use for display elements.
      */
     classNames: IClassNames;
-
-    /**
-     * HTML element to create a view within.
-     */
-    container: HTMLElement;
-
-    /**
-     * Creates contents for a size.
-     */
-    createContents: ICreateContents;
 
     /**
      * Creates a new HTML element.
@@ -55,7 +36,7 @@ export interface IUserWrapprSettings {
     /**
      * Gets the rectangular size of the window.
      */
-    getWindowSize: IGetWindowSize;
+    getAvailableContainerSize: IGetAvailableContainerSize;
 
     /**
      * Require path to the menu initialization script.
@@ -65,7 +46,7 @@ export interface IUserWrapprSettings {
     /**
      * Menus to create inside of the container.
      */
-    menus: IMenu[];
+    menus: IMenuSchema[];
 
     /**
      * Waits before calling an action.
@@ -84,13 +65,34 @@ export interface IUserWrapprSettings {
 }
 
 /**
+ * Required settings to initialize a new IUserWrappr.
+ */
+export interface IRequiredUserWrapprSettings {
+    /**
+     * Creates contents for a size.
+     */
+    createContents: ICreateContents;
+}
+
+/**
+ * Settings to initialize a new IUserWrappr.
+ */
+export type IUserWrapprSettings = Partial<IOptionalUserWrapprSettings> & IRequiredUserWrapprSettings;
+
+/**
+ * Filled-out settings to initialize a new IUserWrappr.
+ */
+export type ICompleteUserWrapprSettings = IOptionalUserWrapprSettings & IRequiredUserWrapprSettings;
+
+/**
  * Creates configurable HTML displays over fixed size contents.
  */
 export interface IUserWrappr {
     /**
      * Initializes a new display and contents.
      *
+     * @param container   Element to instantiate contents within.
      * @returns A Promise for a Display wrapper around contents and their view.
      */
-    createDisplay(): Promise<Display>;
+    createDisplay(container: HTMLElement): Promise<Display>;
 }

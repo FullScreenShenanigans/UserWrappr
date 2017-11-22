@@ -1,6 +1,7 @@
 import { observer } from "mobx-react";
 import * as React from "react";
 
+import { optionStyle } from "../../Bootstrapping/MenuStyles";
 import { ActionOption } from "./ActionOption";
 import { BooleanOption } from "./BooleanOption";
 import { NumberOption } from "./NumberOption";
@@ -34,7 +35,10 @@ const renderOptionStore = (store: OptionStore) => {
 };
 
 export const Options = observer(({ store }: { store: OptionsStore }) => (
-    <div className={store.classNames.options}>
+    <div
+        className={store.classNames.options}
+        style={optionStyle as React.CSSProperties}
+    >
         {store.children.map(renderOptionStore)}
     </div>
 ));

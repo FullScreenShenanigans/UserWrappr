@@ -1,5 +1,6 @@
 {
   "name": "userwrappr",
+  "typing": "./lib/index.d.ts",
   "description": "Creates configurable HTML displays over fixed size contents.",
   "version": "0.6.2",
   "author": {
@@ -45,7 +46,7 @@
         ]
       },
       {
-        "entry": "./src/Menus/Menus.js",
+        "entry": "./src/Menus/InitializeMenus.js",
         "name": "UserWrappr-Delayed",
         "sources": [
           "src/Menus/**/*.js"
@@ -72,14 +73,16 @@
           "dev": "../node_modules/react/umd/react.development",
           "prod": "../node_modules/react/lib/react.production"
         },
-        "name": "react"
+        "name": "react",
+        "requireExternalName": "React"
       },
       {
         "js": {
           "dev": "../node_modules/react-dom/umd/react-dom.development",
           "prod": "../node_modules/react-dom/lib/react-dom.production"
         },
-        "name": "react-dom"
+        "name": "react-dom",
+        "requireExternalName": "ReactDOM"
       }
     ],
     "name": "UserWrappr"

@@ -21,8 +21,11 @@ export class SelectOption extends React.Component<{ store: SaveableStore<ISelect
         );
     }
 
-    private renderOption = (option: string): JSX.Element =>
-        <option key={option} value={option} />
+    private renderOption = (option: string): JSX.Element => (
+        <option key={option} value={option}>
+            {option}
+        </option>
+    )
 
     private changeValue = (event: React.ChangeEvent<HTMLSelectElement>): void => {
         this.props.store.setValue(event.target.value);

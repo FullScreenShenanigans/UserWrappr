@@ -1,5 +1,5 @@
 import { IClassNames, ISetSize } from "../Display";
-import { IMenu } from "./Menus";
+import { IMenuSchema } from "./MenuSchemas";
 import { ISetTimeout, MenuStore } from "./MenuStore";
 import { OptionsStore } from "./Options/OptionsStore";
 
@@ -30,7 +30,7 @@ export interface IMenusStoreDependencies {
     /**
      * Menu schemas to render.
      */
-    menus: IMenu[];
+    menus: IMenuSchema[];
 
     /**
      * Waits before calling an action.
