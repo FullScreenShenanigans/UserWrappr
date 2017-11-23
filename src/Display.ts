@@ -14,6 +14,21 @@ export interface IClassNames {
     innerArea: string;
 
     /**
+     * Class name for an option's container.
+     */
+    option: string;
+
+    /**
+     * Class name for the left half of a two-part option.
+     */
+    optionLeft: string;
+
+    /**
+     * Class name for the right half of a two-part option.
+     */
+    optionRight: string;
+
+    /**
      * Class name for each options list div.
      */
     options: string;

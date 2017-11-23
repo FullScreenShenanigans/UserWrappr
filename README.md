@@ -6,21 +6,33 @@
 Creates configurable HTML displays over fixed size contents.
 <!-- {{/Top}} -->
 
+UserWrappr adds two things on top of HTML contents:
+
+1. Sizing of the game area within the available window space
+2. Delayed creation of game menus from readable schemas
+
 ## Usage
 
 ```typescript
-(code samples and such)
+const userWrapper = new UserWrapper({
+    container: document.querySelector("#app"),
+    createContents: (size: IAbsoluteSizeSchema): void => {
+        const game = new MyGame(size);
+        return game.canvas;
+    }
+})
 ```
 
-### Menu Initializer
+### Required Parameters
 
-External libraries including MobX and React are delay-loaded to preserve optimal performance.
-UserWrappr scripts that depend on them are therefore also delay-loaded.
-`menuInitializer` specifies the RequireJS path to load those scripts.
+#### `container`
 
-### Menu Schemas
+Containing HTML element to create the contents within.
 
-...
+#### `createContents`
+
+Callback that creates the contents.
+Takes in a `size` object with `height` and `width` as numbers of pixels, and returns HTML contents of that size.
 
 ## Details
 
@@ -32,16 +44,14 @@ When you call `createDisplay`, the following happen in order:
 3. Contents are created in the usable area.
 4. Once view libraries are loaded, menus for them are created in the usable area.
 
-### `Display`
+### Sizing Strategy
 
-#### Sizing Strategy
-
-A Display will fill your content and menu to its provided size schema, relative to the visible browser window.
+The container with your content and menus will fill as per its provided size schema, relative to the visible browser window.
 Creation of the display area follows this strategy:
 
 1. The visible window size is measured.
 2. The container size is calculated from the window size and provided size schema.
-3. Basic menu controls is created within the container.
+3. Basic menu controls are created within the container.
 4. The remaining container size is calculated, and contents created within.
 
 Later, a full menu will be created and bound to the menu controls.

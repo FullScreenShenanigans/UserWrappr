@@ -2,7 +2,7 @@ import { IClassNames } from "../Display";
 import { ICreateElement } from "../Elements/createElement";
 import { IMenuSchema } from "../Menus/MenuSchemas";
 import { getAbsoluteSizeRemaining, IAbsoluteSizeSchema } from "../Sizing";
-import { innerAreaStyle, menuStyle, menuTitleStyle } from "./MenuStyles";
+import { innerAreaStyle, menuStyle, menuTitleStyle } from "./Styles";
 
 /**
  * Dependencies to initialize a new AreasFaker.

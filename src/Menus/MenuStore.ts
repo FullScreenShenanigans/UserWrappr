@@ -1,4 +1,4 @@
-import { action } from "mobx";
+import { action, observable } from "mobx";
 import { IClassNames } from "../Display";
 
 /**
@@ -72,6 +72,7 @@ export class MenuStore {
     /**
      * How the menu should visually behave.
      */
+    @observable
     private state: VisualState = VisualState.Closed;
 
     /**
@@ -110,21 +111,43 @@ export class MenuStore {
     }
 
     /**
-     * Toggles whether the menu was opened.
+     * Closes the menu if open.
      *
      * @returns Whether any state change was made.
      */
     @action
-    public toggleOpen = (): boolean => {
-        if (this.isTransitioning()) {
+    public close = (): boolean => {
+        if (this.state !== VisualState.Open) {
             return false;
         }
 
-        if (this.isOpen()) {
-            this.close();
-        } else {
-            this.open();
+        this.state = VisualState.Closing;
+        this.dependencies.setTimeout(
+            (): void => {
+                this.state = VisualState.Closed;
+            },
+            this.dependencies.transitionTime);
+
+        return true;
+    }
+
+    /**
+     * Opens the menu if closed.
+     *
+     * @returns Whether any state change was made.
+     */
+    @action
+    public open = (): boolean => {
+        if (this.state !== VisualState.Closed) {
+            return false;
         }
+
+        this.state = VisualState.Opening;
+        this.dependencies.setTimeout(
+            (): void => {
+                this.state = VisualState.Open;
+            },
+            this.dependencies.transitionTime);
 
         return true;
     }
@@ -145,38 +168,6 @@ export class MenuStore {
             : VisualState.Open;
 
         return true;
-    }
-
-    /**
-     * Closes the menu.
-     */
-    private close() {
-        this.state = VisualState.Closing;
-        this.dependencies.setTimeout(
-            (): void => {
-                this.state = VisualState.Closed;
-            },
-            this.dependencies.transitionTime);
-    }
-
-    /**
-     * Opens the menu.
-     */
-    private open() {
-        this.state = VisualState.Opening;
-        this.dependencies.setTimeout(
-            (): void => {
-                this.state = VisualState.Open;
-            },
-            this.dependencies.transitionTime);
-    }
-
-    /**
-     * @returns Whether the menu is open.
-     */
-    private isOpen() {
-        return this.state === VisualState.Open
-            || this.state === VisualState.PinnedOpen;
     }
 
     /**

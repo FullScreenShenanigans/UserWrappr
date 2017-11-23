@@ -25,6 +25,9 @@ type IOptionalUserWrapprSettingsDefaults = {
 const defaultSettings: IOptionalUserWrapprSettingsDefaults = {
     classNames: () => ({
         innerArea: "inner-area",
+        option: "option",
+        optionLeft: "option-left",
+        optionRight: "option-right",
         options: "options",
         outerArea: "outer-area",
         menu: "menu",
@@ -38,7 +41,7 @@ const defaultSettings: IOptionalUserWrapprSettingsDefaults = {
     getAvailableContainerSize: () => getAvailableContainerSize,
     menuInitializer: () => "UserWrappr-Delayed",
     menus: () => [],
-    setTimeout: () => setTimeout,
+    setTimeout: () => setTimeout.bind(window),
     transitionTime: () => 0,
     requirejs: () => requirejs
 };

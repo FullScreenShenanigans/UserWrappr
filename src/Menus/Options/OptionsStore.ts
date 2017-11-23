@@ -1,6 +1,7 @@
 import { IClassNames } from "../../Display";
 import { ActionStore } from "./ActionStore";
 import { IOptionSchema, OptionType } from "./OptionSchemas";
+import { IOptionStoreDependencies } from "./OptionStore";
 import { SaveableStore } from "./SaveableStore";
 
 /**
@@ -26,7 +27,7 @@ interface IOptionStoreCreator<TOptionStore extends IOptionStore> {
      *
      * @param schema   Schema for the option.
      */
-    new (schema: IOptionSchema): TOptionStore;
+    new (dependencies: IOptionStoreDependencies): TOptionStore;
 }
 
 /**
@@ -43,17 +44,18 @@ const optionStoreCreators: IOptionStoreCreators = {
 /**
  * Creates an option store for its schema.
  *
- * @param schema   Individual option schema within a menu.
+ * @param dependencies   Dependencies for the option store.
  * @returns Store for the option.
  */
-const createOptionStore = (schema: IOptionSchema): IOptionStore => {
+const createOptionStore = (dependencies: IOptionStoreDependencies): IOptionStore => {
+    const { schema } = dependencies;
     const creator: IOptionStoreCreator<IOptionStore> | undefined = optionStoreCreators[schema.type];
 
     if (creator === undefined) {
         throw new Error(`Unknown option type: ${schema.type}`);
     }
 
-    return new optionStoreCreators[schema.type](schema);
+    return new optionStoreCreators[schema.type](dependencies);
 };
 
 /**
@@ -92,7 +94,11 @@ export class OptionsStore {
      */
     public constructor(dependencies: IOptionsStoreDependencies) {
         this.dependencies = dependencies;
-        this.childStores = dependencies.options.map(createOptionStore);
+        this.childStores = dependencies.options.map(
+            (schema: IOptionSchema): IOptionStore => createOptionStore({
+                classNames: this.dependencies.classNames,
+                schema
+            }));
     }
 
     /**

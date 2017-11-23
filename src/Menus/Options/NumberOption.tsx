@@ -1,24 +1,27 @@
 import { observer } from "mobx-react";
 import * as React from "react";
 
+import { optionLeftStyle, optionRightStyle, optionStyle } from "../../Bootstrapping/Styles";
 import { INumberSchema } from "./OptionSchemas";
 import { SaveableStore } from "./SaveableStore";
 
 @observer
 export class NumberOption extends React.Component<{ store: SaveableStore<INumberSchema, number> }> {
     public render() {
+        const { store } = this.props;
+
         return (
-            <div className="option-saveable">
-                <div className="option-left">
-                    {this.props.store.schema.title}
+            <div className={store.classNames.option} style={optionStyle as React.CSSProperties}>
+                <div className={store.classNames.optionLeft} style={optionLeftStyle as React.CSSProperties}>
+                    {store.schema.title}
                 </div>
-                <div className="option-right">
+                <div className={store.classNames.optionRight} style={optionRightStyle as React.CSSProperties}>
                     <input
-                        max={this.props.store.schema.max}
-                        min={this.props.store.schema.min}
+                        max={store.schema.max}
+                        min={store.schema.min}
                         onChange={this.changeValue}
                         type="number"
-                        value={this.props.store.value}
+                        value={store.value}
                     />
                 </div>
             </div>

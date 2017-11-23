@@ -1,18 +1,21 @@
 import { observer } from "mobx-react";
 import * as React from "react";
 
+import { optionLeftStyle, optionRightStyle, optionStyle } from "../../Bootstrapping/Styles";
 import { IBooleanSchema } from "./OptionSchemas";
 import { SaveableStore } from "./SaveableStore";
 
 @observer
 export class BooleanOption extends React.Component<{ store: SaveableStore<IBooleanSchema> }> {
     public render() {
+        const { store } = this.props;
+
         return (
-            <div className="option-saveable">
-                <div className="option-left">
-                    {this.props.store.schema.title}
+            <div className={store.classNames.option} style={optionStyle as React.CSSProperties}>
+                <div className={store.classNames.optionLeft} style={optionLeftStyle as React.CSSProperties}>
+                    {store.schema.title}
                 </div>
-                <div className="option-right">
+                <div className={store.classNames.optionRight} style={optionRightStyle as React.CSSProperties}>
                     {this.renderButton()}
                 </div>
             </div>

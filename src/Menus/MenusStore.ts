@@ -67,7 +67,7 @@ export class MenusStore {
     public constructor(dependencies: IMenusStoreDependencies) {
         this.dependencies = dependencies;
 
-        this.childStores = this.createMenuStores();
+        this.childStores = this.createChildStores();
     }
 
     /**
@@ -89,7 +89,7 @@ export class MenusStore {
      *
      * @returns Stores for child menus and options.
      */
-    private createMenuStores(): IMenuAndOptionsListStores[] {
+    private createChildStores(): IMenuAndOptionsListStores[] {
         const stores: IMenuAndOptionsListStores[] = [];
 
         for (const menu of this.dependencies.menus) {
