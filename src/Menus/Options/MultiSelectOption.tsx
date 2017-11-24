@@ -35,6 +35,7 @@ export class MultiSelectOption extends React.Component<{ store: SaveableStore<IM
         <select
             key={key}
             onChange={(event) => this.changeValue(event, key)}
+            value={this.props.store.value[key]}
             style={this.props.store.styles.input as React.CSSProperties}
         >
             {this.props.store.schema.options.map(this.renderOption)}

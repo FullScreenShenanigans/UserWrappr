@@ -96,7 +96,7 @@ export const defaultStyles: IStyles = {
         alignItems: "stretch",
         display: "flex",
         flexWrap: "wrap",
-        justifyContent: "center",
+        justifyContent: "center"
     },
     innerAreaFake: {},
     input: {},
