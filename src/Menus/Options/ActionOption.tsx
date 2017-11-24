@@ -4,9 +4,10 @@ import * as React from "react";
 import { ActionStore } from "./ActionStore";
 
 export const ActionOption = observer(({ store }: { store: ActionStore }) => {
-    const styles: React.CSSProperties = {
+    const style: React.CSSProperties = {
         ...store.styles.inputButton,
-        ...store.styles.inputButtonOn
+        ...store.styles.inputButtonOn,
+        ...store.styles.inputButtonAction
     } as React.CSSProperties;
 
     return (
@@ -17,7 +18,7 @@ export const ActionOption = observer(({ store }: { store: ActionStore }) => {
             <button
                 name={store.schema.title}
                 onClick={store.activate}
-                style={styles}
+                style={style}
             >
                 {store.schema.title}
             </button>

@@ -26,20 +26,21 @@ export class BooleanOption extends React.Component<{ store: SaveableStore<IBoole
             ? "on"
             : "off";
 
-        const styles: React.CSSProperties = {
+        const style: React.CSSProperties = {
             ...this.props.store.styles.inputButton,
+            ...this.props.store.styles.inputButtonBoolean,
             ...(
                 this.props.store.value
                     ? this.props.store.styles.inputButtonOn
                     : this.props.store.styles.inputButtonOff
-            )
+            ),
         } as React.CSSProperties;
 
         return (
             <button
                 name={this.props.store.schema.title}
                 onClick={this.toggleValue}
-                style={styles}
+                style={style}
             >
                 {descriptor}
             </button>

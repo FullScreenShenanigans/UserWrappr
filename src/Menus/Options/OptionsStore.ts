@@ -1,5 +1,6 @@
 import { IClassNames } from "../../Bootstrapping/ClassNames";
 import { IStyles } from "../../Bootstrapping/Styles";
+import { IAbsoluteSizeSchema } from "../../Sizing";
 import { MenuTitleStore } from "../MenuTitleStore";
 import { ActionStore } from "./ActionStore";
 import { IOptionSchema, OptionType } from "./OptionSchemas";
@@ -71,6 +72,11 @@ export interface IOptionsStoreDependencies {
     classNames: IClassNames;
 
     /**
+     * Size of the bounding container.
+     */
+    containerSize: IAbsoluteSizeSchema;
+
+    /**
      * Handler for the menu title being clicked.
      */
     onClick: () => void;
@@ -92,7 +98,7 @@ export interface IOptionsStoreDependencies {
 }
 
 /**
- * Stores child options.
+ * Stores a list of child options.
  */
 export class OptionsStore {
     /**
@@ -150,6 +156,13 @@ export class OptionsStore {
      */
     public get onClick(): () => void {
         return this.dependencies.onClick;
+    }
+
+    /**
+     * Size of the bounding container.
+     */
+    public get containerSize(): IAbsoluteSizeSchema {
+        return this.dependencies.containerSize;
     }
 
     /**

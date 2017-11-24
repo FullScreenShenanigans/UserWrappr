@@ -36,17 +36,24 @@ const renderOptionStore = (store: OptionStore) => {
     return <Renderer store={store} key={store.schema.title} />;
 };
 
-export const Options = observer(({ store }: { store: OptionsStore }) => (
-    <div
-        className={store.classNames.options}
-        style={store.styles.options as React.CSSProperties}
-    >
+export const Options = observer(({ store }: { store: OptionsStore }) => {
+    const optionsListStyle = {
+        ...store.styles.optionsList,
+        maxHeight: store.containerSize.height
+    } as React.CSSProperties;
+
+    return (
         <div
-            className={store.classNames.optionsList}
-            style={store.styles.optionsList as React.CSSProperties}
+            className={store.classNames.options}
+            style={store.styles.options as React.CSSProperties}
         >
-            {store.children.map(renderOptionStore)}
+            <div
+                className={store.classNames.optionsList}
+                style={optionsListStyle}
+            >
+                {store.children.map(renderOptionStore)}
+            </div>
+            <MenuTitle store={store.titleStore} />
         </div>
-        <MenuTitle store={store.titleStore} />
-    </div>
-));
+    );
+});

@@ -5,7 +5,7 @@ import { defaultStyles } from "./Bootstrapping/Styles";
 import { Display } from "./Display";
 import { ICompleteUserWrapprSettings, IOptionalUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
 import { IInitializeMenusView, IInitializeMenusViewWrapper } from "./Menus/InitializeMenus";
-import { IRelativeSizeSchema } from "./Sizing";
+import { IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
 
 /**
  * View libraries required to initialize a wrapping display.
@@ -136,17 +136,15 @@ export class UserWrappr implements IUserWrappr {
             styles: this.settings.styles
         });
 
-        await display.resetContents(this.settings.defaultSize);
+        const containerSize: IAbsoluteSizeSchema = await display.resetContents(this.settings.defaultSize);
 
         const initializeMenusView: IInitializeMenusView = await viewLibrariesLoad;
 
         await initializeMenusView({
             classNames: this.settings.classNames,
             container,
+            containerSize,
             menus: this.settings.menus,
-            setSize: async (size: IRelativeSizeSchema): Promise<void> => {
-                throw new Error(`Not implemented yet! (should take in size ${JSON.stringify(size)}.`);
-            },
             setTimeout: this.settings.setTimeout,
             styles: this.settings.styles,
             transitionTime: this.settings.transitionTime

@@ -15,14 +15,6 @@ import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } 
 export type ICreateContents = (size: IAbsoluteSizeSchema) => Element;
 
 /**
- * Hook to reset contents to a size.
- *
- * @param size   Rectangular size of an area.
- * @returns A Promise for resetting contents to the size.
- */
-export type ISetSize = (size: IRelativeSizeSchema) => Promise<void>;
-
-/**
  * Menu and content elements, once creatd.
  */
 interface ICreatedElements {
@@ -110,9 +102,9 @@ export class Display {
      * Creates initial contents and fake menus.
      *
      * @param requestedSize   Size of the contents.
-     * @returns A Promise for having created initial contents and fake menus.
+     * @returns A Promise for the actual size of the contents.
      */
-    public async resetContents(requestedSize: IRelativeSizeSchema): Promise<void> {
+    public async resetContents(requestedSize: IRelativeSizeSchema): Promise<IAbsoluteSizeSchema> {
         if (this.createdElements !== undefined) {
             this.dependencies.container.removeChild(this.createdElements.contentArea);
             this.dependencies.container.removeChild(this.createdElements.menuArea);
@@ -127,5 +119,7 @@ export class Display {
         contentArea.appendChild(this.dependencies.createContents(contentSize));
 
         this.createdElements = { contentArea, menuArea };
+
+        return containerSize;
     }
 }

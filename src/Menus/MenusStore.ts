@@ -1,6 +1,6 @@
 import { IStyles } from "../Bootstrapping/Styles";
 import { IClassNames } from "../Bootstrapping/ClassNames";
-import { ISetSize } from "../Display";
+import { IAbsoluteSizeSchema } from "../Sizing";
 import { IMenuSchema } from "./MenuSchemas";
 import { ISetTimeout, MenuStore } from "./MenuStore";
 import { OptionsStore } from "./Options/OptionsStore";
@@ -30,6 +30,11 @@ export interface IMenusStoreDependencies {
     classNames: IClassNames;
 
     /**
+     * Size of the bounding container.
+     */
+    containerSize: IAbsoluteSizeSchema;
+
+    /**
      * Menu schemas to render.
      */
     menus: IMenuSchema[];
@@ -38,11 +43,6 @@ export interface IMenusStoreDependencies {
      * Waits before calling an action.
      */
     setTimeout: ISetTimeout;
-
-    /**
-     * Hook to reset contents to a size.
-     */
-    setSize: ISetSize;
 
     /**
      * Styles to use for display elements.
@@ -117,6 +117,7 @@ export class MenusStore {
 
             const optionsStore = new OptionsStore({
                 classNames: this.dependencies.classNames,
+                containerSize: this.dependencies.containerSize,
                 onClick: menuStore.close,
                 options: menu.options,
                 styles: this.dependencies.styles,

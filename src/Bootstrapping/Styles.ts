@@ -23,6 +23,16 @@ export interface IStyles {
     inputButton: Partial<CSSStyleDeclaration>;
 
     /**
+     * Styles for action input buttons.
+     */
+    inputButtonAction: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for boolean input buttons.
+     */
+    inputButtonBoolean: Partial<CSSStyleDeclaration>;
+
+    /**
      * Styles for input buttons in an off state.
      */
     inputButtonOff: Partial<CSSStyleDeclaration>;
@@ -91,6 +101,8 @@ export const defaultStyles: IStyles = {
     innerAreaFake: {},
     input: {},
     inputButton: {},
+    inputButtonAction: {},
+    inputButtonBoolean: {},
     inputButtonOff: {},
     inputButtonOn: {},
     menuChildrenOpen: {},
@@ -125,5 +137,7 @@ export const defaultStyles: IStyles = {
         position: "absolute",
         width: "100%"
     },
-    optionsList: {}
+    optionsList: {
+        overflowY: "auto"
+    }
 };

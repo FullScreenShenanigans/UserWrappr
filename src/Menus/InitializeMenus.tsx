@@ -43,9 +43,9 @@ export interface IInitializeMenusViewWrapper {
 export const initializeMenus: IInitializeMenusView = async (dependencies: IWrappingViewDependencies): Promise<void> => {
     const store = new MenusStore({
         classNames: dependencies.classNames,
+        containerSize: dependencies.containerSize,
         menus: dependencies.menus,
         setTimeout: dependencies.setTimeout,
-        setSize: dependencies.setSize,
         styles: dependencies.styles,
         transitionTime: dependencies.transitionTime
     });
