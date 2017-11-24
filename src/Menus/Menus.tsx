@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import * as React from "react";
 
 import { Menu } from "./Menu";
@@ -10,11 +11,18 @@ const renderMenuAndOptionsList = (stores: IMenuAndOptionsListStores) => (
     </Menu>
 );
 
-export const Menus = ({ store }: { store: MenusStore }) => (
-    <div
-        className={store.classNames.innerArea}
-        style={store.styles.innerArea as React.CSSProperties}
-    >
-        {store.menuAndOptionListStores.map(renderMenuAndOptionsList)}
-    </div>
-);
+export const Menus = observer(({ store }: { store: MenusStore }) => {
+    const style = {
+        ...store.styles.innerArea,
+        width: `${store.containerSize.width}px`
+    } as React.CSSProperties;
+
+    return (
+        <div
+            className={store.classNames.innerArea}
+            style={style}
+        >
+            {store.menuAndOptionListStores.map(renderMenuAndOptionsList)}
+        </div>
+    );
+});

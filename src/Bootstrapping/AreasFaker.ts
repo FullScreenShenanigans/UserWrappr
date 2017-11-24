@@ -80,8 +80,13 @@ export class AreasFaker {
         // DOM elements need some alone time to compute their size
         await Promise.resolve();
 
-        const menuSize = menuArea.getBoundingClientRect();
+        const clientRect = menuArea.getBoundingClientRect();
+        const menuSize: IAbsoluteSizeSchema = {
+            height: Math.round(clientRect.height),
+            width: Math.round(clientRect.width)
+        };
 
+        console.log("Faked at", menuSize);
         return { menuArea, menuSize };
     }
 

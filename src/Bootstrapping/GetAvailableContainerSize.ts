@@ -19,7 +19,7 @@ export const getAvailableContainerSize = (container: HTMLElement) => {
     const boundingArea = container.getBoundingClientRect();
 
     return {
-        height: window.innerHeight - boundingArea.top,
-        width: boundingArea.width
+        height: window.innerHeight - Math.round(boundingArea.top),
+        width: Math.round(boundingArea.width)
     };
 };

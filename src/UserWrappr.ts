@@ -92,6 +92,8 @@ export class UserWrappr implements IUserWrappr {
      */
     private display: Display;
 
+    private viewLibrariesLoading: Promise<IInitializeMenusView>;
+
     /**
      * Initializes a new instance of the UserWrappr class.
      *
@@ -124,9 +126,9 @@ export class UserWrappr implements IUserWrappr {
             throw new Error("Cannot create multiple displays from a UserWrappr.");
         }
 
-        const viewLibrariesLoad: Promise<IInitializeMenusView> = this.loadViewLibraries();
+        this.viewLibrariesLoading = this.loadViewLibraries();
 
-        const display: Display = new Display({
+        this.display = new Display({
             classNames: this.settings.classNames,
             container,
             createElement: this.settings.createElement,
@@ -136,13 +138,30 @@ export class UserWrappr implements IUserWrappr {
             styles: this.settings.styles
         });
 
-        const containerSize: IAbsoluteSizeSchema = await display.resetContents(this.settings.defaultSize);
+        await this.resetSize(this.settings.defaultSize);
+    }
 
-        const initializeMenusView: IInitializeMenusView = await viewLibrariesLoad;
+    /**
+     * Resets the internal contents to a new size, if created yet.
+     *
+     * @param size   New size of the contents.
+     * @returns A Promise for whether the display was available to reset size.
+     */
+    public async resetSize(size: IRelativeSizeSchema): Promise<boolean> {
+        if (this.viewLibrariesLoading === undefined) {
+            throw new Error("A display must be created before resetting size.");
+        }
+
+        if (this.display === undefined) {
+            return false;
+        }
+
+        const containerSize: IAbsoluteSizeSchema = await this.display.resetContents(size);
+        const initializeMenusView: IInitializeMenusView = await this.viewLibrariesLoading;
 
         await initializeMenusView({
             classNames: this.settings.classNames,
-            container,
+            container: this.display.getContainer(),
             containerSize,
             menus: this.settings.menus,
             setTimeout: this.settings.setTimeout,
@@ -150,25 +169,6 @@ export class UserWrappr implements IUserWrappr {
             transitionTime: this.settings.transitionTime
         });
 
-        this.display = display;
-    }
-
-    public resetControls(): void {
-        console.log("I suppose this is supposed to do something...");
-    }
-
-    /**
-     * Resets the internal contents to a new size, if created yet.
-     *
-     * @param size   New size of the contents.
-     * @returns Whether the display was available to reset size.
-     */
-    public resetSize(size: IRelativeSizeSchema): boolean {
-        if (this.display === undefined) {
-            return false;
-        }
-
-        this.display.resetContents(size);
         return true;
     }
 

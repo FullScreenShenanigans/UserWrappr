@@ -139,7 +139,7 @@ export interface IRequiredUserWrapprSettings {
 /**
  * Settings to initialize a new IUserWrappr.
  */
-export type IUserWrapprSettings = IPartialOptionalUserWrapprSettings & IRequiredUserWrapprSettings;
+export type IUserWrapprSettings = Partial<IPartialOptionalUserWrapprSettings> & IRequiredUserWrapprSettings;
 
 /**
  * Filled-out settings to initialize a new IUserWrappr.
@@ -162,7 +162,7 @@ export interface IUserWrappr {
      * Resets the internal contents to a new size, if created yet.
      *
      * @param size   New size of the contents.
-     * @returns Whether the display was available to reset size.
+     * @returns A Promise for whether the display was available to reset size.
      */
-    resetSize(size: IRelativeSizeSchema): boolean;
+    resetSize(size: IRelativeSizeSchema): Promise<boolean>;
 }

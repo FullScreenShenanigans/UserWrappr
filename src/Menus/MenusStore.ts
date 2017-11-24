@@ -1,5 +1,5 @@
-import { IStyles } from "../Bootstrapping/Styles";
 import { IClassNames } from "../Bootstrapping/ClassNames";
+import { IStyles } from "../Bootstrapping/Styles";
 import { IAbsoluteSizeSchema } from "../Sizing";
 import { IMenuSchema } from "./MenuSchemas";
 import { ISetTimeout, MenuStore } from "./MenuStore";
@@ -82,6 +82,13 @@ export class MenusStore {
      */
     public get classNames(): IClassNames {
         return this.dependencies.classNames;
+    }
+
+    /**
+     * Size of the bounding container.
+     */
+    public get containerSize(): IAbsoluteSizeSchema {
+        return this.dependencies.containerSize;
     }
 
     /**
