@@ -1,4 +1,6 @@
-import { IClassNames, ISetSize } from "../Display";
+import { IStyles } from "../Bootstrapping/Styles";
+import { IClassNames } from "../Bootstrapping/ClassNames";
+import { ISetSize } from "../Display";
 import { IMenuSchema } from "./MenuSchemas";
 import { ISetTimeout, MenuStore } from "./MenuStore";
 import { OptionsStore } from "./Options/OptionsStore";
@@ -43,6 +45,11 @@ export interface IMenusStoreDependencies {
     setSize: ISetSize;
 
     /**
+     * Styles to use for display elements.
+     */
+    styles: IStyles;
+
+    /**
      * How long to transition between visual states.
      */
     transitionTime: number;
@@ -85,6 +92,13 @@ export class MenusStore {
     }
 
     /**
+     * Styles to use for display elements.
+     */
+    public get styles(): IStyles {
+        return this.dependencies.styles;
+    }
+
+    /**
      * Creates stores for child menus and options.
      *
      * @returns Stores for child menus and options.
@@ -93,17 +107,25 @@ export class MenusStore {
         const stores: IMenuAndOptionsListStores[] = [];
 
         for (const menu of this.dependencies.menus) {
+            const menuStore = new MenuStore({
+                classNames: this.dependencies.classNames,
+                setTimeout: this.dependencies.setTimeout,
+                styles: this.dependencies.styles,
+                title: menu.title,
+                transitionTime: this.dependencies.transitionTime
+            });
+
+            const optionsStore = new OptionsStore({
+                classNames: this.dependencies.classNames,
+                onClick: menuStore.close,
+                options: menu.options,
+                styles: this.dependencies.styles,
+                title: menu.title
+            });
+
             stores.push({
-                menu: new MenuStore({
-                    classNames: this.dependencies.classNames,
-                    setTimeout: this.dependencies.setTimeout,
-                    title: menu.title,
-                    transitionTime: this.dependencies.transitionTime
-                }),
-                options: new OptionsStore({
-                    classNames: this.dependencies.classNames,
-                    options: menu.options
-                })
+                menu: menuStore,
+                options: optionsStore
             });
         }
 

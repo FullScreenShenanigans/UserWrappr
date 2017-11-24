@@ -4,6 +4,7 @@
 export type IOptionSchema = (
     | IActionSchema
     | IBooleanSchema
+    | IMultiSelectSchema
     | INumberSchema
     | ISelectSchema
     | IStringSchema
@@ -23,6 +24,11 @@ export const enum OptionType {
      * Boolean toggle state.
      */
     Boolean = "boolean",
+
+    /**
+     * Multiple selections of given preset values.
+     */
+    MultiSelect = "multi-select",
 
     /**
      * Numeric value within a range.
@@ -102,6 +108,26 @@ export interface IBooleanSchema extends ISaveableSchema<boolean> {
      * Type of the option (boolean).
      */
     type: OptionType.Boolean;
+}
+
+/**
+ * Option that stores multiple options within given preset values.
+ */
+export interface IMultiSelectSchema extends ISaveableSchema<string[]> {
+    /**
+     * Given preset values.
+     */
+    options: string[];
+
+    /**
+     * How many of the preset options may be chosen at once.
+     */
+    selections: number;
+
+    /**
+     * Type of the option (select).
+     */
+    type: OptionType.MultiSelect;
 }
 
 /**

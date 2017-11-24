@@ -1,7 +1,9 @@
+import { defaultClassNames } from "./Bootstrapping/ClassNames";
+import { createElement } from "./Bootstrapping/CreateElement";
+import { getAvailableContainerSize } from "./Bootstrapping/GetAvailableContainerSize";
+import { defaultStyles } from "./Bootstrapping/Styles";
 import { Display } from "./Display";
-import { createElement } from "./Elements/createElement";
-import { getAvailableContainerSize } from "./Elements/getAvailableContainerSize";
-import { ICompleteUserWrapprSettings, IOptionalUserWrapprSettings, IUserWrapprSettings } from "./IUserWrappr";
+import { ICompleteUserWrapprSettings, IOptionalUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
 import { IInitializeMenusView, IInitializeMenusViewWrapper } from "./Menus/InitializeMenus";
 import { IRelativeSizeSchema } from "./Sizing";
 
@@ -21,18 +23,11 @@ type IOptionalUserWrapprSettingsDefaults = {
 
 /**
  * Getters for the defaults of each optional UserWrappr setting.
+ *
+ * @remarks This allows scripts to not attempt to access overriden globals like requirejs.
  */
 const defaultSettings: IOptionalUserWrapprSettingsDefaults = {
-    classNames: () => ({
-        innerArea: "inner-area",
-        option: "option",
-        optionLeft: "option-left",
-        optionRight: "option-right",
-        options: "options",
-        outerArea: "outer-area",
-        menu: "menu",
-        menuTitle: "menu-title"
-    }),
+    classNames: () => defaultClassNames,
     createElement: () => createElement,
     defaultSize: () => ({
         height: "100%",
@@ -42,26 +37,60 @@ const defaultSettings: IOptionalUserWrapprSettingsDefaults = {
     menuInitializer: () => "UserWrappr-Delayed",
     menus: () => [],
     setTimeout: () => setTimeout.bind(window),
+    styles: () => defaultStyles,
     transitionTime: () => 0,
     requirejs: () => requirejs
 };
 
 /**
- * @remarks This allows scripts to not attempt to access overriden globals like requirejs.
+ * Backs up an optional provided setting with its default.
+ *
+ * @param value   Provided partial setting, if it exists.
+ * @param getDefault   Gets the default setting value.
+ * @returns Complete filled-out setting value.
  */
-const getDefaultSetting = <TSetting>(value: TSetting | undefined, backup: () => TSetting): TSetting =>
+const ensureOptionalSetting = <TSetting>(value: TSetting | undefined, getDefault: () => TSetting): TSetting =>
     value === undefined
-        ? backup()
+        ? getDefault()
         : value;
+
+/**
+ * Overrides a default setting with a provided partial setting.
+ *
+ * @param value   Provided partial setting, if it exists.
+ * @param getDefault   Gets the default setting value.
+ * @returns Complete filled-out setting value.
+ */
+const overrideDefaultSetting = <TSetting extends object>(value: Partial<TSetting> | undefined, backup: () => TSetting): TSetting => {
+    if (value === undefined) {
+        return backup();
+    }
+
+    const output: Partial<TSetting> = backup();
+
+    for (const key in value) {
+        output[key] = {
+            ...(output[key] as object),
+            ...(value[key] as object)
+        };
+    }
+
+    return output as TSetting;
+};
 
 /**
  * Creates configurable HTML displays over fixed size contents.
  */
-export class UserWrappr {
+export class UserWrappr implements IUserWrappr {
     /**
      * Settings for the UserWrappr.
      */
     private readonly settings: ICompleteUserWrapprSettings;
+
+    /**
+     * Contains generated contents and menus, once instantiated.
+     */
+    private display: Display;
 
     /**
      * Initializes a new instance of the UserWrappr class.
@@ -70,16 +99,17 @@ export class UserWrappr {
      */
     public constructor(settings: IUserWrapprSettings) {
         this.settings = {
-            classNames: getDefaultSetting(settings.classNames, defaultSettings.classNames),
+            classNames: overrideDefaultSetting(settings.classNames, defaultSettings.classNames),
             createContents: settings.createContents,
-            createElement: getDefaultSetting(settings.createElement, defaultSettings.createElement),
-            defaultSize: getDefaultSetting(settings.defaultSize, defaultSettings.defaultSize),
-            getAvailableContainerSize: getDefaultSetting(settings.getAvailableContainerSize, defaultSettings.getAvailableContainerSize),
-            menuInitializer: getDefaultSetting(settings.menuInitializer, defaultSettings.menuInitializer),
-            menus: getDefaultSetting(settings.menus, defaultSettings.menus),
-            setTimeout: getDefaultSetting(settings.setTimeout, defaultSettings.setTimeout),
-            transitionTime: getDefaultSetting(settings.transitionTime, defaultSettings.transitionTime),
-            requirejs: getDefaultSetting(settings.requirejs, defaultSettings.requirejs),
+            createElement: ensureOptionalSetting(settings.createElement, defaultSettings.createElement),
+            defaultSize: ensureOptionalSetting(settings.defaultSize, defaultSettings.defaultSize),
+            getAvailableContainerSize: ensureOptionalSetting(settings.getAvailableContainerSize, defaultSettings.getAvailableContainerSize),
+            menuInitializer: ensureOptionalSetting(settings.menuInitializer, defaultSettings.menuInitializer),
+            menus: ensureOptionalSetting(settings.menus, defaultSettings.menus),
+            setTimeout: ensureOptionalSetting(settings.setTimeout, defaultSettings.setTimeout),
+            styles: overrideDefaultSetting(settings.styles, defaultSettings.styles),
+            transitionTime: ensureOptionalSetting(settings.transitionTime, defaultSettings.transitionTime),
+            requirejs: ensureOptionalSetting(settings.requirejs, defaultSettings.requirejs),
         };
     }
 
@@ -87,9 +117,13 @@ export class UserWrappr {
      * Initializes a new display and contents.
      *
      * @param container   Element to instantiate contents within.
-     * @returns A Promise for a Display wrapper around contents and their view.
+     * @returns A Promise for having created contents and menus.
      */
-    public async createDisplay(container: HTMLElement): Promise<Display> {
+    public async createDisplay(container: HTMLElement): Promise<void> {
+        if (this.display !== undefined) {
+            throw new Error("Cannot create multiple displays from a UserWrappr.");
+        }
+
         const viewLibrariesLoad: Promise<IInitializeMenusView> = this.loadViewLibraries();
 
         const display: Display = new Display({
@@ -99,6 +133,7 @@ export class UserWrappr {
             createContents: this.settings.createContents,
             getAvailableContainerSize: this.settings.getAvailableContainerSize,
             menus: this.settings.menus,
+            styles: this.settings.styles
         });
 
         await display.resetContents(this.settings.defaultSize);
@@ -113,14 +148,30 @@ export class UserWrappr {
                 throw new Error(`Not implemented yet! (should take in size ${JSON.stringify(size)}.`);
             },
             setTimeout: this.settings.setTimeout,
+            styles: this.settings.styles,
             transitionTime: this.settings.transitionTime
         });
 
-        return display;
+        this.display = display;
     }
 
     public resetControls(): void {
         console.log("I suppose this is supposed to do something...");
+    }
+
+    /**
+     * Resets the internal contents to a new size, if created yet.
+     *
+     * @param size   New size of the contents.
+     * @returns Whether the display was available to reset size.
+     */
+    public resetSize(size: IRelativeSizeSchema): boolean {
+        if (this.display === undefined) {
+            return false;
+        }
+
+        this.display.resetContents(size);
+        return true;
     }
 
     /**

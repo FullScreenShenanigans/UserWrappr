@@ -2,6 +2,7 @@ import * as sinon from "sinon";
 
 import { OptionType } from "../../../../src/Menus/Options/OptionSchemas";
 import { SaveableStore } from "../../../../src/Menus/Options/SaveableStore";
+import { stubClassNames } from "../../../UserWrappr/stubs";
 
 export const stubSaveableStore = () => {
     const initialValue = "abc";
@@ -9,7 +10,10 @@ export const stubSaveableStore = () => {
     const title = "saveable store";
     const type = OptionType.Boolean;
     const saveValue = sinon.spy();
-    const store = new SaveableStore({ getInitialValue, title, type, saveValue });
+    const store = new SaveableStore({
+        classNames: stubClassNames,
+        schema: { getInitialValue, title, type, saveValue }
+    });
 
     return { getInitialValue, title, saveValue, store };
 };

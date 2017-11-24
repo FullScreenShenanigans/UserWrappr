@@ -1,61 +1,129 @@
 /**
- * Styles for the inner area of the menus container.
+ * Styles to use for display elements.
  */
-export const innerAreaStyle: Partial<CSSStyleDeclaration> = {
-    display: "flex",
-    alignItems: "stretch",
-    justifyContent: "center",
-};
+export interface IStyles {
+    /**
+     * Styles for the inner area of the menus container.
+     */
+    innerArea: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for a fake version of inner area of the menus container.
+     */
+    innerAreaFake: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for input elements.
+     */
+    input: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for input buttons.
+     */
+    inputButton: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for input buttons in an off state.
+     */
+    inputButtonOff: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for input buttons in an on state.
+     */
+    inputButtonOn: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for a hidden children container in a menu.
+     */
+    menuChildrenClosed: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for a visible children container in a menu.
+     */
+    menuChildrenOpen: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for each menu.
+     */
+    menu: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for each menu's title.
+     */
+    menuTitle: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for an option's container.
+     */
+    option: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for the left half of a two-part option.
+     */
+    optionLeft: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for the right half of a two-part option.
+     */
+    optionRight: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for a container of options.
+     */
+    options: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for a list of options within its container.
+     */
+    optionsList: Partial<CSSStyleDeclaration>;
+}
 
 /**
- * Styles for each menu.
+ * Default styles to use for display elements.
  */
-export const menuStyle: Partial<CSSStyleDeclaration> = {
-    flex: "1",
-    position: "relative",
-    textAlign: "center"
-};
-
-/**
- * Styles for each menu's title.
- */
-export const menuTitleStyle: Partial<CSSStyleDeclaration> = {
-    cursor: "pointer",
-    margin: "0"
-};
-
-/**
- * Styles for an option's container.
- */
-export const optionStyle: Partial<CSSStyleDeclaration> = {
-    display: "flex",
-    flexDirection: "row",
-    flexGrow: "0",
-    flexWrap: "wrap"
-};
-
-/**
- * Styles for the left half of a two-part option.
- */
-export const optionLeftStyle: Partial<CSSStyleDeclaration> = {
-    flexGrow: "1",
-    width: "50%"
-};
-
-/**
- * Styles for the right half of a two-part option.
- */
-export const optionRightStyle: Partial<CSSStyleDeclaration> = {
-    flexGrow: "1",
-    width: "50%"
-};
-
-/**
- * Styles for a container of options.
- */
-export const optionsStyle: Partial<CSSStyleDeclaration> = {
-    bottom: "0",
-    marginBottom: "2.1em",
-    position: "absolute",
-    width: "100%"
+export const defaultStyles: IStyles = {
+    innerArea: {
+        alignItems: "stretch",
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+    },
+    innerAreaFake: {},
+    input: {},
+    inputButton: {},
+    inputButtonOff: {},
+    inputButtonOn: {},
+    menuChildrenOpen: {},
+    menuChildrenClosed: {
+        display: "none"
+    },
+    menu: {
+        flex: "1",
+        position: "relative",
+        textAlign: "center"
+    },
+    menuTitle: {
+        cursor: "pointer",
+        margin: "0"
+    },
+    option: {
+        display: "flex",
+        flexDirection: "row",
+        flexGrow: "0",
+        flexWrap: "wrap"
+    },
+    optionLeft: {
+        flexGrow: "1",
+        width: "50%"
+    },
+    optionRight: {
+        flexGrow: "1",
+        width: "50%"
+    },
+    options: {
+        bottom: "0",
+        position: "absolute",
+        width: "100%"
+    },
+    optionsList: {}
 };

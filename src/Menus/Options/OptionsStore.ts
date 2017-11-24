@@ -1,4 +1,6 @@
-import { IClassNames } from "../../Display";
+import { IClassNames } from "../../Bootstrapping/ClassNames";
+import { IStyles } from "../../Bootstrapping/Styles";
+import { MenuTitleStore } from "../MenuTitleStore";
 import { ActionStore } from "./ActionStore";
 import { IOptionSchema, OptionType } from "./OptionSchemas";
 import { IOptionStoreDependencies } from "./OptionStore";
@@ -36,6 +38,7 @@ interface IOptionStoreCreator<TOptionStore extends IOptionStore> {
 const optionStoreCreators: IOptionStoreCreators = {
     [OptionType.Action]: ActionStore as IOptionStoreCreator<ActionStore>,
     [OptionType.Boolean]: SaveableStore as IOptionStoreCreator<SaveableStore>,
+    [OptionType.MultiSelect]: SaveableStore as IOptionStoreCreator<SaveableStore>,
     [OptionType.Number]: SaveableStore as IOptionStoreCreator<SaveableStore>,
     [OptionType.Select]: SaveableStore as IOptionStoreCreator<SaveableStore>,
     [OptionType.String]: SaveableStore as IOptionStoreCreator<SaveableStore>
@@ -68,9 +71,24 @@ export interface IOptionsStoreDependencies {
     classNames: IClassNames;
 
     /**
+     * Handler for the menu title being clicked.
+     */
+    onClick: () => void;
+
+    /**
      * Schemas for each option.
      */
     options: IOptionSchema[];
+
+    /**
+     * Styles to use for display elements.
+     */
+    styles: IStyles;
+
+    /**
+     * Menu title to display.
+     */
+    title: string;
 }
 
 /**
@@ -88,6 +106,11 @@ export class OptionsStore {
     private readonly childStores: IOptionStore[];
 
     /**
+     * Store for the options' menu title.
+     */
+    private menuTitleStore: MenuTitleStore;
+
+    /**
      * Initializes a new instance of the OptionsStore class.
      *
      * @param dependencies   Dependencies to be used for initialization.
@@ -97,8 +120,15 @@ export class OptionsStore {
         this.childStores = dependencies.options.map(
             (schema: IOptionSchema): IOptionStore => createOptionStore({
                 classNames: this.dependencies.classNames,
-                schema
+                schema,
+                styles: this.dependencies.styles
             }));
+        this.menuTitleStore = new MenuTitleStore({
+            classNames: this.dependencies.classNames,
+            onClick: this.dependencies.onClick,
+            styles: this.dependencies.styles,
+            title: this.dependencies.title
+        });
     }
 
     /**
@@ -113,5 +143,26 @@ export class OptionsStore {
      */
     public get classNames(): IClassNames {
         return this.dependencies.classNames;
+    }
+
+    /**
+     * Handler for the menu title being clicked.
+     */
+    public get onClick(): () => void {
+        return this.dependencies.onClick;
+    }
+
+    /**
+     * Styles to use for display elements.
+     */
+    public get styles(): IStyles {
+        return this.dependencies.styles;
+    }
+
+    /**
+     * Store for the options' menu title.
+     */
+    public get titleStore(): MenuTitleStore {
+        return this.menuTitleStore;
     }
 }

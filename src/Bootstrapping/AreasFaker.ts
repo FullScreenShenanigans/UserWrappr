@@ -1,8 +1,8 @@
-import { IClassNames } from "../Display";
-import { ICreateElement } from "../Elements/createElement";
+import { IClassNames } from "../Bootstrapping/ClassNames";
+import { ICreateElement } from "../Bootstrapping/CreateElement";
+import { IStyles } from "../Bootstrapping/Styles";
 import { IMenuSchema } from "../Menus/MenuSchemas";
 import { getAbsoluteSizeRemaining, IAbsoluteSizeSchema } from "../Sizing";
-import { innerAreaStyle, menuStyle, menuTitleStyle } from "./Styles";
 
 /**
  * Dependencies to initialize a new AreasFaker.
@@ -27,6 +27,26 @@ export interface IAreasFakerDependencies {
      * Menus to create inside of the container.
      */
     menus: IMenuSchema[];
+
+    /**
+     * Styles to use for display elements.
+     */
+    styles: IStyles;
+}
+
+/**
+ * Estimation for a menu area element and size.
+ */
+export interface IMenuAreaEstimation {
+    /**
+     * Fake menu area element.
+     */
+    menuArea: HTMLElement;
+
+    /**
+     * Estimated size of the menu area.
+     */
+    menuSize: IAbsoluteSizeSchema;
 }
 
 /**
@@ -50,11 +70,15 @@ export class AreasFaker {
     /**
      * Creates and adds a realistically sized area for menu titles.
      *
-     * @returns A Promise for the remaining usable space within the container.
+     * @param containerSize   Maximum allowed size from the parent container.
+     * @returns A Promise for the menu area and the remaining usable space within the container.
      */
-    public async addMenuArea() {
-        const menuArea = this.createAreaWithMenuTitles();
+    public async createAndAppendMenuArea(containerSize: IAbsoluteSizeSchema): Promise<IMenuAreaEstimation> {
+        const menuArea = this.createAreaWithMenuTitles(containerSize);
         this.dependencies.container.appendChild(menuArea);
+
+        // DOM elements need some alone time to compute their size
+        await Promise.resolve();
 
         const menuSize = menuArea.getBoundingClientRect();
 
@@ -83,12 +107,20 @@ export class AreasFaker {
     /**
      * Creates an area with titles for each menu.
      *
+     * @param containerSize   Maximum allowed size from the parent container.
      * @returns An area with titles for each menu.
      */
-    private createAreaWithMenuTitles(): HTMLElement {
+    private createAreaWithMenuTitles(containerSize: IAbsoluteSizeSchema): HTMLElement {
         const innerArea = this.dependencies.createElement("div", {
-            className: this.dependencies.classNames.innerArea,
-            style: innerAreaStyle
+            className: [
+                this.dependencies.classNames.innerArea,
+                this.dependencies.classNames.innerAreaFake
+            ].join(" "),
+            style: {
+                ...this.dependencies.styles.innerArea,
+                ...this.dependencies.styles.innerAreaFake,
+                width: `${containerSize.width}px`
+            }
         });
         const outerArea = this.dependencies.createElement("div", {
             className: this.dependencies.classNames.outerArea,
@@ -102,11 +134,11 @@ export class AreasFaker {
                     children: [
                         this.dependencies.createElement("h4", {
                             className: this.dependencies.classNames.menuTitle,
-                            style: menuTitleStyle,
+                            style: this.dependencies.styles.menuTitle,
                             textContent: menu.title
                         })
                     ],
-                    style: menuStyle
+                    style: this.dependencies.styles.menu
                 }));
         }
 

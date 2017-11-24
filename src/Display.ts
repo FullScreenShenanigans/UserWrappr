@@ -1,53 +1,10 @@
 import { AreasFaker } from "./Bootstrapping/AreasFaker";
-import { ICreateElement } from "./Elements/createElement";
-import { IGetAvailableContainerSize } from "./Elements/getAvailableContainerSize";
+import { IClassNames } from "./Bootstrapping/ClassNames";
+import { ICreateElement } from "./Bootstrapping/CreateElement";
+import { IGetAvailableContainerSize } from "./Bootstrapping/GetAvailableContainerSize";
+import { IStyles } from "./Bootstrapping/Styles";
 import { IMenuSchema } from "./Menus/MenuSchemas";
 import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
-
-/**
- * Class names to use for display elements.
- */
-export interface IClassNames {
-    /**
-     * Class name for the inner area div.
-     */
-    innerArea: string;
-
-    /**
-     * Class name for an option's container.
-     */
-    option: string;
-
-    /**
-     * Class name for the left half of a two-part option.
-     */
-    optionLeft: string;
-
-    /**
-     * Class name for the right half of a two-part option.
-     */
-    optionRight: string;
-
-    /**
-     * Class name for each options list div.
-     */
-    options: string;
-
-    /**
-     * Class name for the surrounding area div.
-     */
-    outerArea: string;
-
-    /**
-     * Class name for each menu's div.
-     */
-    menu: string;
-
-    /**
-     * Class name for each menu title div.
-     */
-    menuTitle: string;
-}
 
 /**
  * Creates contents for a size.
@@ -64,6 +21,21 @@ export type ICreateContents = (size: IAbsoluteSizeSchema) => Element;
  * @returns A Promise for resetting contents to the size.
  */
 export type ISetSize = (size: IRelativeSizeSchema) => Promise<void>;
+
+/**
+ * Menu and content elements, once creatd.
+ */
+interface ICreatedElements {
+    /**
+     * Contains the created contents.
+     */
+    contentArea: HTMLElement;
+
+    /**
+     * Contains the real or fake menu elements.
+     */
+    menuArea: HTMLElement;
+}
 
 /**
  * Dependencies to initialize a new Display.
@@ -98,6 +70,11 @@ export interface IDisplayDependencies {
      * Menus to create inside of the view.
      */
     menus: IMenuSchema[];
+
+    /**
+     * Styles to use for display elements.
+     */
+    styles: IStyles;
 }
 
 /**
@@ -115,6 +92,11 @@ export class Display {
     private readonly areasFaker: AreasFaker;
 
     /**
+     * Menu and content elements, once created.
+     */
+    private createdElements: ICreatedElements | undefined;
+
+    /**
      * Initializes a new instance of the Display class.
      *
      * @param dependencies   Dependencies to be used for initialization.
@@ -125,20 +107,25 @@ export class Display {
     }
 
     /**
-     * Resets the internal contents to a new size.
+     * Creates initial contents and fake menus.
      *
-     * @param requestedSize   New size of the contents.
-     * @returns A Promise for a AreasFaker for the requested size.
+     * @param requestedSize   Size of the contents.
+     * @returns A Promise for having created initial contents and fake menus.
      */
-    public resetContents = async (requestedSize: IRelativeSizeSchema): Promise<void> => {
+    public async resetContents(requestedSize: IRelativeSizeSchema): Promise<void> {
+        if (this.createdElements !== undefined) {
+            this.dependencies.container.removeChild(this.createdElements.contentArea);
+            this.dependencies.container.removeChild(this.createdElements.menuArea);
+        }
+
         const availableContainerSize: IAbsoluteSizeSchema = this.dependencies.getAvailableContainerSize(this.dependencies.container);
         const containerSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(availableContainerSize, requestedSize);
-        const { menuArea, menuSize } = await this.areasFaker.addMenuArea();
+        const { menuArea, menuSize } = await this.areasFaker.createAndAppendMenuArea(containerSize);
         const { contentSize, contentArea } = this.areasFaker.createContentArea(containerSize, menuSize);
 
         this.dependencies.container.insertBefore(contentArea, menuArea);
+        contentArea.appendChild(this.dependencies.createContents(contentSize));
 
-        const contents = this.dependencies.createContents(contentSize);
-        contentArea.appendChild(contents);
+        this.createdElements = { contentArea, menuArea };
     }
 }

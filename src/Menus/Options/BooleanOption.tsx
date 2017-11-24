@@ -1,21 +1,20 @@
 import { observer } from "mobx-react";
 import * as React from "react";
 
-import { optionLeftStyle, optionRightStyle, optionStyle } from "../../Bootstrapping/Styles";
 import { IBooleanSchema } from "./OptionSchemas";
 import { SaveableStore } from "./SaveableStore";
 
 @observer
 export class BooleanOption extends React.Component<{ store: SaveableStore<IBooleanSchema> }> {
-    public render() {
+    public render(): JSX.Element {
         const { store } = this.props;
 
         return (
-            <div className={store.classNames.option} style={optionStyle as React.CSSProperties}>
-                <div className={store.classNames.optionLeft} style={optionLeftStyle as React.CSSProperties}>
+            <div className={store.classNames.option} style={store.styles.option as React.CSSProperties}>
+                <div className={store.classNames.optionLeft} style={store.styles.optionLeft as React.CSSProperties}>
                     {store.schema.title}
                 </div>
-                <div className={store.classNames.optionRight} style={optionRightStyle as React.CSSProperties}>
+                <div className={store.classNames.optionRight} style={store.styles.optionRight as React.CSSProperties}>
                     {this.renderButton()}
                 </div>
             </div>
@@ -24,11 +23,24 @@ export class BooleanOption extends React.Component<{ store: SaveableStore<IBoole
 
     private renderButton() {
         const descriptor = this.props.store.value
-            ? "off"
-            : "on";
+            ? "on"
+            : "off";
+
+        const styles: React.CSSProperties = {
+            ...this.props.store.styles.inputButton,
+            ...(
+                this.props.store.value
+                    ? this.props.store.styles.inputButtonOn
+                    : this.props.store.styles.inputButtonOff
+            )
+        } as React.CSSProperties;
 
         return (
-            <button name={this.props.store.schema.title} onClick={this.toggleValue}>
+            <button
+                name={this.props.store.schema.title}
+                onClick={this.toggleValue}
+                style={styles}
+            >
                 {descriptor}
             </button>
         );

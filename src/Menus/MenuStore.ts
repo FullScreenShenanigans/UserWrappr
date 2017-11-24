@@ -1,5 +1,8 @@
 import { action, observable } from "mobx";
-import { IClassNames } from "../Display";
+
+import { IClassNames } from "../Bootstrapping/ClassNames";
+import { IStyles } from "../Bootstrapping/Styles";
+import { MenuTitleStore } from "./MenuTitleStore";
 
 /**
  * How a menu should visually behave.
@@ -55,6 +58,11 @@ export interface IMenuStoreDependencies {
     setTimeout: ISetTimeout;
 
     /**
+     * Styles to use for display elements.
+     */
+    styles: IStyles;
+
+    /**
      * Section title of the menu.
      */
     title: string;
@@ -81,12 +89,23 @@ export class MenuStore {
     private readonly dependencies: IMenuStoreDependencies;
 
     /**
+     * Store for the menu title.
+     */
+    private readonly title: MenuTitleStore;
+
+    /**
      * Initializes a new instance of the MenuStore class.
      *
      * @param dependencies   Dependencies used for initialization.
      */
     public constructor(dependencies: IMenuStoreDependencies) {
         this.dependencies = dependencies;
+        this.title = new MenuTitleStore({
+            classNames: this.dependencies.classNames,
+            onClick: this.close,
+            styles: this.dependencies.styles,
+            title: this.dependencies.title
+        });
     }
 
     /**
@@ -97,10 +116,17 @@ export class MenuStore {
     }
 
     /**
-     * Section title of the menu.
+     * Styles to use for display elements.
      */
-    public get title(): string {
-        return this.dependencies.title;
+    public get styles(): IStyles {
+        return this.dependencies.styles;
+    }
+
+    /**
+     * Store for the menu title.
+     */
+    public get titleStore(): MenuTitleStore {
+        return this.title;
     }
 
     /**
@@ -108,6 +134,38 @@ export class MenuStore {
      */
     public get visualState(): VisualState {
         return this.state;
+    }
+
+    /**
+     * Toggles whether the menu is open.
+     *
+     * @returns Whether any state change was made.
+     */
+    @action
+    public toggleOpen = (): boolean => {
+        if (this.isOpen()) {
+            return this.close();
+        } else {
+            return this.open();
+        }
+    }
+
+    /**
+     * Toggles whether the menu is pinned.
+     *
+     * @returns Whether any state change was made.
+     */
+    @action
+    public togglePinned = (): boolean => {
+        if (this.isClosed() || this.isTransitioning()) {
+            return false;
+        }
+
+        this.state = this.state === VisualState.Open
+            ? VisualState.PinnedOpen
+            : VisualState.Open;
+
+        return true;
     }
 
     /**
@@ -153,28 +211,18 @@ export class MenuStore {
     }
 
     /**
-     * Toggles whether the menu is pinned.
-     *
-     * @returns Whether any state change was made.
+     * @returns Whether the menu is closed.
      */
-    @action
-    public togglePinned = (): boolean => {
-        if (this.isClosed() || this.isTransitioning()) {
-            return false;
-        }
-
-        this.state = this.state === VisualState.Open
-            ? VisualState.PinnedOpen
-            : VisualState.Open;
-
-        return true;
+    private isClosed(): boolean {
+        return this.state === VisualState.Closed;
     }
 
     /**
-     * @returns Whether the menu is closed.
+     * @returns Whether the menu is open.
      */
-    private isClosed() {
-        return this.state === VisualState.Closed;
+    private isOpen(): boolean {
+        return this.state === VisualState.Open
+            || this.state === VisualState.PinnedOpen;
     }
 
     /**

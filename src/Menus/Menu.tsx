@@ -1,8 +1,8 @@
 import { observer } from "mobx-react";
 import * as React from "react";
 
-import { menuStyle, menuTitleStyle } from "../Bootstrapping/Styles";
 import { MenuStore, VisualState } from "./MenuStore";
+import { MenuTitle } from "./MenuTitle";
 
 const isVisualStateOpen = (visualState: VisualState): boolean => {
     return visualState === VisualState.Open || visualState === VisualState.PinnedOpen;
@@ -21,16 +21,16 @@ export const Menu = observer(({ children, store }: { children?: React.ReactNode;
     return (
         <div
             className={className}
-            onMouseOver={store.open}
-            style={menuStyle as React.CSSProperties}
+            onClick={store.open}
+            style={store.styles.menu as React.CSSProperties}
         >
-            {isOpen ? children : undefined}
-            <h4
-                className={store.classNames.menuTitle}
-                style={menuTitleStyle as React.CSSProperties}
+            <div
+                className={store.classNames.menuChildren}
+                style={(isOpen ? store.styles.menuChildrenOpen : store.styles.menuChildrenClosed) as React.CSSProperties}
             >
-                {store.title}
-            </h4>
+                {isOpen ? children : undefined}
+            </div>
+            <MenuTitle store={store.titleStore} />
         </div>
     );
 });

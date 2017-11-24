@@ -1,4 +1,5 @@
-import { IClassNames } from "../../Display";
+import { IClassNames } from "../../Bootstrapping/ClassNames";
+import { IStyles } from "../../Bootstrapping/Styles";
 import { IBasicSchema } from "./OptionSchemas";
 
 /**
@@ -14,6 +15,11 @@ export interface IOptionStoreDependencies<TSchema extends IBasicSchema = IBasicS
      * Schema for the option.
      */
     schema: TSchema;
+
+    /**
+     * Styles to use for display elements.
+     */
+    styles: IStyles;
 }
 
 /**
@@ -48,5 +54,12 @@ export abstract class OptionStore<TSchema extends IBasicSchema = IBasicSchema> {
      */
     public get schema(): Readonly<TSchema> {
         return this.dependencies.schema;
+    }
+
+    /**
+     * Styles to use for display elements.
+     */
+    public get styles(): IStyles {
+        return this.dependencies.styles;
     }
 }

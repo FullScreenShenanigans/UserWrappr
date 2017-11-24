@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { createElement } from "../../src/Elements/createElement";
+import { createElement } from "../../src/Elements/CreateElement";
 import { it } from "../main";
 
 it("creates an element when given a tag name", () => {

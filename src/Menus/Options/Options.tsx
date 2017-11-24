@@ -1,9 +1,10 @@
 import { observer } from "mobx-react";
 import * as React from "react";
 
-import { optionsStyle } from "../../Bootstrapping/Styles";
+import { MenuTitle } from "../MenuTitle";
 import { ActionOption } from "./ActionOption";
 import { BooleanOption } from "./BooleanOption";
+import { MultiSelectOption } from "./MultiSelectOption";
 import { NumberOption } from "./NumberOption";
 import { OptionType } from "./OptionSchemas";
 import { OptionsStore } from "./OptionsStore";
@@ -20,6 +21,7 @@ type IOptionRenderer = (
 const storeRenderers = new Map<OptionType, IOptionRenderer>([
     [OptionType.Action, ActionOption],
     [OptionType.Boolean, BooleanOption],
+    [OptionType.MultiSelect, MultiSelectOption],
     [OptionType.Number, NumberOption],
     [OptionType.Select, SelectOption],
     [OptionType.String, StringOption],
@@ -37,8 +39,14 @@ const renderOptionStore = (store: OptionStore) => {
 export const Options = observer(({ store }: { store: OptionsStore }) => (
     <div
         className={store.classNames.options}
-        style={optionsStyle as React.CSSProperties}
+        style={store.styles.options as React.CSSProperties}
     >
-        {store.children.map(renderOptionStore)}
+        <div
+            className={store.classNames.optionsList}
+            style={store.styles.optionsList as React.CSSProperties}
+        >
+            {store.children.map(renderOptionStore)}
+        </div>
+        <MenuTitle store={store.titleStore} />
     </div>
 ));

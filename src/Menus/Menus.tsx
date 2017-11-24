@@ -6,12 +6,15 @@ import { Options } from "./Options/Options";
 
 const renderMenuAndOptionsList = (stores: IMenuAndOptionsListStores) => (
     <Menu store={stores.menu}>
-        <Options key={stores.menu.title} store={stores.options} />
+        <Options key={stores.menu.titleStore.title} store={stores.options} />
     </Menu>
 );
 
-export class Menus extends React.Component<{ store: MenusStore }> {
-    public render() {
-        return this.props.store.menuAndOptionListStores.map(renderMenuAndOptionsList);
-    }
-}
+export const Menus = ({ store }: { store: MenusStore }) => (
+    <div
+        className={store.classNames.innerArea}
+        style={store.styles.innerArea as React.CSSProperties}
+    >
+        {store.menuAndOptionListStores.map(renderMenuAndOptionsList)}
+    </div>
+);

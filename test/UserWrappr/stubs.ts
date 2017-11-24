@@ -1,6 +1,6 @@
 import { BrowserClock, createClock } from "lolex";
 
-import { createElement } from "../../src/Elements/createElement";
+import { createElement } from "../../src/Elements/CreateElement";
 import { IOptionalUserWrapprSettings, IRequiredUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "../../src/IUserWrappr";
 import { IAbsoluteSizeSchema } from "../../src/Sizing";
 import { UserWrappr } from "../../src/UserWrappr";
@@ -14,6 +14,17 @@ export interface ITestUserWrappr extends ITestUserWrapprSettings {
     container: HTMLElement;
     userWrapper: IUserWrappr;
 }
+
+export const stubClassNames = {
+    innerArea: "user-wrappr-stubs-inner-area",
+    option: "user-wrappr-stubs-option",
+    optionLeft: "user-wrappr-stubs-option-left",
+    optionRight: "user-wrappr-stubs-option-right",
+    options: "user-wrappr-stubs-options",
+    outerArea: "user-wrappr-stubs-outer-area",
+    menu: "user-wrappr-stubs-menu",
+    menuTitle: "user-wrappr-stubs-menu-title"
+};
 
 const stubUserWrapprSettings = (): ITestUserWrapprSettings => {
     const contents = document.createElement("canvas");
@@ -36,13 +47,7 @@ const stubUserWrapprSettings = (): ITestUserWrapprSettings => {
             height: 700,
             width: 840
         }),
-        classNames: {
-            innerArea: "user-wrappr-stubs-inner-area",
-            options: "user-wrappr-options",
-            outerArea: "user-wrappr-outer-area",
-            menu: "user-wrappr-menu",
-            menuTitle: "user-wrappr-title"
-        },
+        classNames: stubClassNames,
         menuInitializer: "../src/Menus/InitializeMenus",
         menus: [],
         setTimeout: clock.setTimeout,
