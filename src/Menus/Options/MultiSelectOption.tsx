@@ -49,8 +49,8 @@ export class MultiSelectOption extends React.Component<{ store: SaveableStore<IM
     )
 
     private changeValue = (event: React.ChangeEvent<HTMLSelectElement>, key: number): void => {
-        const values = this.props.store.value;
-        values[key] = event.target.value;
-        this.props.store.setValue(values);
+        const newValue = [].slice.call(this.props.store.value);
+        newValue[key] = event.target.value;
+        this.props.store.setValue(newValue);
     }
 }

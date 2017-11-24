@@ -27,11 +27,12 @@ export class SaveableStore<TSchema extends ISaveableSchema<TValue> = ISaveableSc
     /**
      * Sets a new state for the value.
      *
-     * @param state   New state for the value.
+     * @param newValue   New state for the value.
      */
     @action
-    public setValue = (value: TValue): void => {
-        this.currentValue = value;
-        this.schema.saveValue(value);
+    public setValue = (newValue: TValue): void => {
+        const oldValue = this.currentValue;
+        this.currentValue = newValue;
+        this.schema.saveValue(newValue, oldValue);
     }
 }

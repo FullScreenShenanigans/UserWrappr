@@ -95,9 +95,10 @@ export interface ISaveableSchema<TValue> extends IBasicSchema {
     /**
      * Saves a new state value.
      *
-     * @param state   New state value.
+     * @param newValue   New state for the value.
+     * @param oldValue   Old state for the value.
      */
-    saveValue(state: TValue): void;
+    saveValue(neWValue: TValue, oldValue: TValue): void;
 }
 
 /**
