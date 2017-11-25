@@ -86,7 +86,6 @@ export class AreasFaker {
             width: Math.round(clientRect.width)
         };
 
-        console.log("Faked at", menuSize);
         return { menuArea, menuSize };
     }
 
@@ -97,11 +96,12 @@ export class AreasFaker {
      * @param menuAreaSize   Size taken up by the menu.
      */
     public createContentArea(containerSize: IAbsoluteSizeSchema, menuAreaSize: IAbsoluteSizeSchema) {
-        const contentSize = getAbsoluteSizeRemaining(containerSize, menuAreaSize);
+        const contentSize = getAbsoluteSizeRemaining(containerSize, menuAreaSize.height);
         const contentArea = this.dependencies.createElement("div", {
+            className: this.dependencies.classNames.contentArea,
             style: {
+                ...this.dependencies.styles.contentArea,
                 height: `${contentSize.height}px`,
-                position: "relative",
                 width: `${contentSize.width}px`,
             }
         });
@@ -118,17 +118,17 @@ export class AreasFaker {
     private createAreaWithMenuTitles(containerSize: IAbsoluteSizeSchema): HTMLElement {
         const innerArea = this.dependencies.createElement("div", {
             className: [
-                this.dependencies.classNames.innerArea,
-                this.dependencies.classNames.innerAreaFake
+                this.dependencies.classNames.menusInnerArea,
+                this.dependencies.classNames.menusInnerAreaFake
             ].join(" "),
             style: {
-                ...this.dependencies.styles.innerArea,
-                ...this.dependencies.styles.innerAreaFake,
+                ...this.dependencies.styles.menusInnerArea,
+                ...this.dependencies.styles.menusInnerAreaFake,
                 width: `${containerSize.width}px`
             }
         });
         const outerArea = this.dependencies.createElement("div", {
-            className: this.dependencies.classNames.outerArea,
+            className: this.dependencies.classNames.menusOuterArea,
             children: [innerArea]
         });
 

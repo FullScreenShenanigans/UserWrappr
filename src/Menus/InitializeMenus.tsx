@@ -45,12 +45,10 @@ export const initializeMenus: IInitializeMenusView = async (dependencies: IWrapp
         classNames: dependencies.classNames,
         containerSize: dependencies.containerSize,
         menus: dependencies.menus,
-        setTimeout: dependencies.setTimeout,
-        styles: dependencies.styles,
-        transitionTime: dependencies.transitionTime
+        styles: dependencies.styles
     });
 
-    const menusContainerQuery = `.${dependencies.classNames.outerArea}`;
+    const menusContainerQuery = `.${dependencies.classNames.menusOuterArea}`;
     const menusContainer = dependencies.container.querySelector(menusContainerQuery);
     if (menusContainer === null) {
         throw new Error(`Could not find menus container under '${menusContainerQuery}'.`);

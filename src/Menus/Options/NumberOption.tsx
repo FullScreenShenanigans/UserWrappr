@@ -16,8 +16,8 @@ export class NumberOption extends React.Component<{ store: SaveableStore<INumber
                 </div>
                 <div className={store.classNames.optionRight} style={store.styles.optionRight as React.CSSProperties}>
                     <input
-                        max={store.schema.max}
-                        min={store.schema.min}
+                        max={store.schema.maximum}
+                        min={store.schema.minimum}
                         onChange={this.changeValue}
                         style={store.styles.input as React.CSSProperties}
                         type="number"

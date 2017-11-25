@@ -3,14 +3,9 @@
  */
 export interface IClassNames {
     /**
-     * Class name for the inner area div.
+     * Class name for the contents container.
      */
-    innerArea: string;
-
-    /**
-     * Class name for a faked inner area div.
-     */
-    innerAreaFake: string;
+    contentArea: string;
 
     /**
      * Class name for each menu's div.
@@ -21,6 +16,21 @@ export interface IClassNames {
      * Class name for each menu's children container.
      */
     menuChildren: string;
+
+    /**
+     * Class name for the inner area div.
+     */
+    menusInnerArea: string;
+
+    /**
+     * Class name for a faked inner area div.
+     */
+    menusInnerAreaFake: string;
+
+    /**
+     * Class name for the surrounding area div.
+     */
+    menusOuterArea: string;
 
     /**
      * Class name for each menu title div.
@@ -51,26 +61,22 @@ export interface IClassNames {
      * Class name for each options list within its container.
      */
     optionsList: string;
-
-    /**
-     * Class name for the surrounding area div.
-     */
-    outerArea: string;
 }
 
 /**
  * Default class names to use for display elements.
  */
 export const defaultClassNames: IClassNames = {
-    innerArea: "menus-inner-area",
-    innerAreaFake: "menus-inner-area-fake",
+    contentArea: "content-area",
     menu: "menu",
     menuChildren: "menu-children",
+    menusInnerArea: "menus-inner-area",
+    menusInnerAreaFake: "menus-inner-area-fake",
+    menusOuterArea: "menus-outer-area",
     menuTitle: "menu-title",
     option: "option",
     optionLeft: "option-left",
     optionRight: "option-right",
     options: "options",
-    optionsList: "options-list",
-    outerArea: "menus-outer-area"
+    optionsList: "options-list"
 };

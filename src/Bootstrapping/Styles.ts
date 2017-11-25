@@ -3,14 +3,9 @@
  */
 export interface IStyles {
     /**
-     * Styles for the inner area of the menus container.
+     * Styles for the content area container.
      */
-    innerArea: Partial<CSSStyleDeclaration>;
-
-    /**
-     * Styles for a fake version of inner area of the menus container.
-     */
-    innerAreaFake: Partial<CSSStyleDeclaration>;
+    contentArea: Partial<CSSStyleDeclaration>;
 
     /**
      * Styles for input elements.
@@ -58,6 +53,16 @@ export interface IStyles {
     menu: Partial<CSSStyleDeclaration>;
 
     /**
+     * Styles for the inner area of the menus container.
+     */
+    menusInnerArea: Partial<CSSStyleDeclaration>;
+
+    /**
+     * Styles for a fake version of inner area of the menus container.
+     */
+    menusInnerAreaFake: Partial<CSSStyleDeclaration>;
+
+    /**
      * Styles for each menu's title.
      */
     menuTitle: Partial<CSSStyleDeclaration>;
@@ -92,13 +97,16 @@ export interface IStyles {
  * Default styles to use for display elements.
  */
 export const defaultStyles: IStyles = {
-    innerArea: {
+    contentArea: {
+        position: "relative"
+    },
+    menusInnerArea: {
         alignItems: "stretch",
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center"
     },
-    innerAreaFake: {},
+    menusInnerAreaFake: {},
     input: {},
     inputButton: {},
     inputButtonAction: {},
@@ -115,8 +123,10 @@ export const defaultStyles: IStyles = {
         textAlign: "center"
     },
     menuTitle: {
-        cursor: "pointer",
-        margin: "0"
+        cursor: "default",
+        display: "inline-block",
+        margin: "0",
+        padding: "3px 21px"
     },
     option: {
         display: "flex",

@@ -77,9 +77,14 @@ export interface IOptionsStoreDependencies {
     containerSize: IAbsoluteSizeSchema;
 
     /**
-     * Handler for the menu title being clicked.
+     * Handler for the mouse moving out of the menu.
      */
-    onClick: () => void;
+    onMouseLeave: () => void;
+
+    /**
+     * Handler for the mouse moving onto the menu title.
+     */
+    onTitleMouseEnter: () => void;
 
     /**
      * Schemas for each option.
@@ -131,7 +136,7 @@ export class OptionsStore {
             }));
         this.menuTitleStore = new MenuTitleStore({
             classNames: this.dependencies.classNames,
-            onClick: this.dependencies.onClick,
+            onMouseEnter: this.dependencies.onTitleMouseEnter,
             styles: this.dependencies.styles,
             title: this.dependencies.title
         });
@@ -152,10 +157,10 @@ export class OptionsStore {
     }
 
     /**
-     * Handler for the menu title being clicked.
+     * Handler for the menu title being no longer hovered over.
      */
-    public get onClick(): () => void {
-        return this.dependencies.onClick;
+    public get onMouseLeave(): () => void {
+        return this.dependencies.onMouseLeave;
     }
 
     /**

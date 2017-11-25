@@ -17,12 +17,13 @@ it("sets the state on the store when given a new state", () => {
 
 it("saves the state when given a new state", () => {
     // Arrange
-    const { saveValue, store } = stubSaveableStore();
+    const { getInitialValue, saveValue, store } = stubSaveableStore();
+    const oldValue = getInitialValue();
     const newValue = "def";
 
     // Act
     store.setValue(newValue);
 
     // Assert
-    expect(saveValue).to.have.been.calledWithExactly(newValue);
+    expect(saveValue).to.have.been.calledWithExactly(newValue, oldValue);
 });

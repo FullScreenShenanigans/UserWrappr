@@ -1,10 +1,9 @@
 import { IClassNames } from "./Bootstrapping/ClassNames";
 import { ICreateElement } from "./Bootstrapping/CreateElement";
-import { IGetAvailableContainerSize } from "./Bootstrapping/GetAvailableContainerSize";
+import { IGetAvailableContainerHeight } from "./Bootstrapping/GetAvailableContainerHeight";
 import { IStyles } from "./Bootstrapping/Styles";
 import { ICreateContents } from "./Display";
 import { IMenuSchema } from "./Menus/MenuSchemas";
-import { ISetTimeout } from "./Menus/MenuStore";
 import { IRelativeSizeSchema } from "./Sizing";
 
 /**
@@ -31,39 +30,29 @@ export interface IOptionalUserWrapprSettings {
     createElement: ICreateElement;
 
     /**
-     * Initial size to create a container at.
+     * Initial size to create contents at.
      */
     defaultSize: IRelativeSizeSchema;
 
     /**
-     * Gets the rectangular size of the window.
+     * Gets how much height is available to hold contents.
      */
-    getAvailableContainerSize: IGetAvailableContainerSize;
+    getAvailableContainerHeight: IGetAvailableContainerHeight;
 
     /**
-     * Require path to the menu initialization script.
+     * RequireJS path to the menu initialization script.
      */
     menuInitializer: string;
 
     /**
-     * Menus to create inside of the container.
+     * Menus to create inside the menus area.
      */
     menus: IMenuSchema[];
-
-    /**
-     * Waits before calling an action.
-     */
-    setTimeout: ISetTimeout;
 
     /**
      * Styles to use for display elements.
      */
     styles: IStyles;
-
-    /**
-     * How long to transition between visual states.
-     */
-    transitionTime: number;
 
     /**
      * Loads external scripts.
@@ -91,9 +80,9 @@ export interface IPartialOptionalUserWrapprSettings {
     defaultSize: IRelativeSizeSchema;
 
     /**
-     * Gets the rectangular size of the window.
+     * Gets how much height is available to size a container.
      */
-    getAvailableContainerSize: IGetAvailableContainerSize;
+    getAvailableContainerHeight: IGetAvailableContainerHeight;
 
     /**
      * Require path to the menu initialization script.
@@ -106,19 +95,9 @@ export interface IPartialOptionalUserWrapprSettings {
     menus: IMenuSchema[];
 
     /**
-     * Waits before calling an action.
-     */
-    setTimeout: ISetTimeout;
-
-    /**
      * Styles to use for display elements.
      */
     styles: Partial<IStyles>;
-
-    /**
-     * How long to transition between visual states.
-     */
-    transitionTime: number;
 
     /**
      * Loads external scripts.

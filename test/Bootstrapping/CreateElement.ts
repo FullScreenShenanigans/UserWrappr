@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { createElement } from "../../src/Elements/CreateElement";
+import { createElement } from "../../src/Bootstrapping/CreateElement";
 import { it } from "../main";
 
 it("creates an element when given a tag name", () => {
@@ -48,4 +48,18 @@ it("sets the textContent of the element when given a textContent", () => {
 
     // Assert
     expect(element.textContent).to.be.equal(textContent);
+});
+
+it("adds style properties to the element when given a style", () => {
+    // Arrange
+    const style: Partial<CSSStyleDeclaration> = {
+        backgroundColor: "blue",
+        color: "red",
+    };
+
+    // Act
+    const element = createElement("div", { style });
+
+    // Assert
+    expect(element.style).to.contain(style);
 });

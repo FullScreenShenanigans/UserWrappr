@@ -98,7 +98,7 @@ export interface ISaveableSchema<TValue> extends IBasicSchema {
      * @param newValue   New state for the value.
      * @param oldValue   Old state for the value.
      */
-    saveValue(neWValue: TValue, oldValue: TValue): void;
+    saveValue(newValue: TValue, oldValue: TValue): void;
 }
 
 /**
@@ -112,7 +112,7 @@ export interface IBooleanSchema extends ISaveableSchema<boolean> {
 }
 
 /**
- * Option that stores multiple options within given preset values.
+ * Option that stores multiple options within preset values.
  */
 export interface IMultiSelectSchema extends ISaveableSchema<string[]> {
     /**
@@ -121,7 +121,7 @@ export interface IMultiSelectSchema extends ISaveableSchema<string[]> {
     options: string[];
 
     /**
-     * How many of the preset options may be chosen at once.
+     * How many of the preset options must be chosen at once.
      */
     selections: number;
 
@@ -138,12 +138,12 @@ export interface INumberSchema extends ISaveableSchema<number> {
     /**
      * Maximum numeric value, if any.
      */
-    max?: number;
+    maximum?: number;
 
     /**
      * Minimum numeric value, if any.
      */
-    min?: number;
+    minimum?: number;
 
     /**
      * Type of the option (numeric).
@@ -152,7 +152,7 @@ export interface INumberSchema extends ISaveableSchema<number> {
 }
 
 /**
- * Option that stores one of its given preset values.
+ * Option that stores one of its preset values.
  */
 export interface ISelectSchema extends ISaveableSchema<string> {
     /**
@@ -171,16 +171,14 @@ export interface ISelectSchema extends ISaveableSchema<string> {
  */
 export interface IStringSchema extends ISaveableSchema<string> {
     /**
-     * Any suggestions for the value.
-     */
-    suggestions?: string[];
-
-    /**
      * Type of the option (string).
      */
     type: OptionType.String;
 }
 
+/**
+ * Unknown option type.
+ */
 export interface IUnknownSchema extends IBasicSchema {
     /**
      * Type of the option (unknown).

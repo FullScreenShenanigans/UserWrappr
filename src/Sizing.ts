@@ -56,7 +56,7 @@ const convertRelativeToAbsoluteSize = (container: number, relative: IRelativeSiz
  * Converts a relative size schema to its absolute pixel equivalents.
  *
  * @param container   Containing area for the relative sizes.
- * @param requestedSize User-friendly relative sizes.
+ * @param requestedSize   User-friendly relative sizes.
  * @returns The absolute size schema equivalent for the sizes.
  */
 export const getAbsoluteSizeInContainer = (container: IAbsoluteSizeSchema, requestedSize: IRelativeSizeSchema): IAbsoluteSizeSchema => ({
@@ -64,7 +64,14 @@ export const getAbsoluteSizeInContainer = (container: IAbsoluteSizeSchema, reque
     width: convertRelativeToAbsoluteSize(container.width, requestedSize.width)
 });
 
-export const getAbsoluteSizeRemaining = (container: IAbsoluteSizeSchema, removedSize: IAbsoluteSizeSchema): IAbsoluteSizeSchema => ({
-    height: container.height - removedSize.height,
+/**
+ * Removes a vertical area from a container size.
+ *
+ * @param container   Containing area for the relative sizes.
+ * @param height   Vertical amount to remove from the container.
+ * @returns Remaining area in the container.
+ */
+export const getAbsoluteSizeRemaining = (container: IAbsoluteSizeSchema, height: number): IAbsoluteSizeSchema => ({
+    height: container.height - height,
     width: container.width
 });

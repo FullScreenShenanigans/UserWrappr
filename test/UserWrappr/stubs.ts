@@ -1,6 +1,9 @@
 import { BrowserClock, createClock } from "lolex";
+import { SinonSpy, spy } from "sinon";
 
-import { createElement } from "../../src/Elements/CreateElement";
+import { IClassNames } from "../../src/Bootstrapping/ClassNames";
+import { createElement } from "../../src/Bootstrapping/CreateElement";
+import { IStyles } from "../../src/Bootstrapping/Styles";
 import { IOptionalUserWrapprSettings, IRequiredUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "../../src/IUserWrappr";
 import { IAbsoluteSizeSchema } from "../../src/Sizing";
 import { UserWrappr } from "../../src/UserWrappr";
@@ -8,6 +11,7 @@ import { UserWrappr } from "../../src/UserWrappr";
 export interface ITestUserWrapprSettings extends IOptionalUserWrapprSettings, IRequiredUserWrapprSettings {
     contents: Element;
     clock: BrowserClock;
+    requirejs: SinonSpy;
 }
 
 export interface ITestUserWrappr extends ITestUserWrapprSettings {
@@ -15,15 +19,76 @@ export interface ITestUserWrappr extends ITestUserWrapprSettings {
     userWrapper: IUserWrappr;
 }
 
-export const stubClassNames = {
-    innerArea: "user-wrappr-stubs-inner-area",
+export const stubClassNames: IClassNames = {
+    contentArea: "user-wrappr-stubs-content-area",
+    menu: "user-wrappr-stubs-menu",
+    menuChildren: "user-wrappr-stubs-menu-children",
+    menusInnerArea: "user-wrappr-stubs-inner-area",
+    menusInnerAreaFake: "user-wrappr-stubs-inner-area-fake",
+    menusOuterArea: "user-wrappr-stubs-outer-area",
+    menuTitle: "user-wrappr-stubs-menu-title",
     option: "user-wrappr-stubs-option",
     optionLeft: "user-wrappr-stubs-option-left",
     optionRight: "user-wrappr-stubs-option-right",
     options: "user-wrappr-stubs-options",
-    outerArea: "user-wrappr-stubs-outer-area",
-    menu: "user-wrappr-stubs-menu",
-    menuTitle: "user-wrappr-stubs-menu-title"
+    optionsList: "user-wrappr-stubs-options-list",
+};
+
+export const stubStyles: IStyles = {
+    contentArea: {
+        textAlign: "right",
+    },
+    input: {
+        textAlign: "right"
+    },
+    inputButton: {
+        textAlign: "left"
+    },
+    inputButtonAction: {
+        textAlign: "center"
+    },
+    inputButtonBoolean: {
+        textAlign: "right"
+    },
+    inputButtonOff: {
+        textAlign: "left"
+    },
+    inputButtonOn: {
+        textAlign: "center"
+    },
+    menuChildrenOpen: {
+        textAlign: "right"
+    },
+    menuChildrenClosed: {
+        textAlign: "left"
+    },
+    menu: {
+        textAlign: "center"
+    },
+    menusInnerArea: {
+        textAlign: "left"
+    },
+    menusInnerAreaFake: {
+        textAlign: "center"
+    },
+    menuTitle: {
+        textAlign: "right"
+    },
+    option: {
+        textAlign: "left"
+    },
+    optionLeft: {
+        textAlign: "center"
+    },
+    optionRight: {
+        textAlign: "right"
+    },
+    options: {
+        textAlign: "left"
+    },
+    optionsList: {
+        textAlign: "center"
+    }
 };
 
 const stubUserWrapprSettings = (): ITestUserWrapprSettings => {
@@ -31,8 +96,9 @@ const stubUserWrapprSettings = (): ITestUserWrapprSettings => {
     const clock = createClock<BrowserClock>();
 
     return {
-        contents,
+        classNames: stubClassNames,
         clock,
+        contents,
         createContents: (size: IAbsoluteSizeSchema) => {
             contents.height = size.height;
             contents.width = size.width;
@@ -43,16 +109,11 @@ const stubUserWrapprSettings = (): ITestUserWrapprSettings => {
             height: 350,
             width: 490
         },
-        getAvailableContainerSize: () => ({
-            height: 700,
-            width: 840
-        }),
-        classNames: stubClassNames,
+        getAvailableContainerHeight: (): number => 700,
         menuInitializer: "../src/Menus/InitializeMenus",
         menus: [],
-        setTimeout: clock.setTimeout,
-        requirejs,
-        transitionTime: 350
+        styles: stubStyles,
+        requirejs: spy(requirejs)
     };
 };
 
@@ -60,7 +121,7 @@ export const stubUserWrappr = (settings: Partial<IUserWrapprSettings> = {}): ITe
     const fullSettings: ITestUserWrapprSettings = {
         ...stubUserWrapprSettings(),
         ...settings
-    };
+    } as ITestUserWrapprSettings;
     const container = document.createElement("div");
     const userWrapper: IUserWrappr = new UserWrappr(fullSettings);
 

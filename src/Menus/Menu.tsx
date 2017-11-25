@@ -4,12 +4,8 @@ import * as React from "react";
 import { MenuStore, VisualState } from "./MenuStore";
 import { MenuTitle } from "./MenuTitle";
 
-const isVisualStateOpen = (visualState: VisualState): boolean => {
-    return visualState === VisualState.Open || visualState === VisualState.PinnedOpen;
-};
-
 export const Menu = observer(({ children, store }: { children?: React.ReactNode; store: MenuStore }) => {
-    const isOpen = isVisualStateOpen(store.visualState);
+    const isOpen = store.visualState === VisualState.Open;
     const className = [
         store.classNames.menu,
         " ",
@@ -21,7 +17,6 @@ export const Menu = observer(({ children, store }: { children?: React.ReactNode;
     return (
         <div
             className={className}
-            onClick={store.open}
             style={store.styles.menu as React.CSSProperties}
         >
             <div

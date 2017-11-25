@@ -1,6 +1,6 @@
 import { defaultClassNames } from "./Bootstrapping/ClassNames";
 import { createElement } from "./Bootstrapping/CreateElement";
-import { getAvailableContainerSize } from "./Bootstrapping/GetAvailableContainerSize";
+import { getAvailableContainerHeight } from "./Bootstrapping/GetAvailableContainerHeight";
 import { defaultStyles } from "./Bootstrapping/Styles";
 import { Display } from "./Display";
 import { ICompleteUserWrapprSettings, IOptionalUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
@@ -33,12 +33,10 @@ const defaultSettings: IOptionalUserWrapprSettingsDefaults = {
         height: "100%",
         width: "100%"
     }),
-    getAvailableContainerSize: () => getAvailableContainerSize,
+    getAvailableContainerHeight: () => getAvailableContainerHeight,
     menuInitializer: () => "UserWrappr-Delayed",
     menus: () => [],
-    setTimeout: () => setTimeout.bind(window),
     styles: () => defaultStyles,
-    transitionTime: () => 0,
     requirejs: () => requirejs
 };
 
@@ -55,7 +53,25 @@ const ensureOptionalSetting = <TSetting>(value: TSetting | undefined, getDefault
         : value;
 
 /**
- * Overrides a default setting with a provided partial setting.
+ * Overrides a default setting with a provided partial setting one level deep.
+ *
+ * @param value   Provided partial setting, if it exists.
+ * @param getDefault   Gets the default setting value.
+ * @returns Complete filled-out setting value.
+ */
+const extendDefaultSetting = <TSetting extends object>(value: Partial<TSetting> | undefined, backup: () => TSetting): TSetting => {
+    if (value === undefined) {
+        return backup();
+    }
+
+    return {
+        ...(backup() as object),
+        ...(value as object)
+    } as TSetting;
+};
+
+/**
+ * Overrides a default setting with a provided partial setting two levels deep.
  *
  * @param value   Provided partial setting, if it exists.
  * @param getDefault   Gets the default setting value.
@@ -101,16 +117,16 @@ export class UserWrappr implements IUserWrappr {
      */
     public constructor(settings: IUserWrapprSettings) {
         this.settings = {
-            classNames: overrideDefaultSetting(settings.classNames, defaultSettings.classNames),
+            classNames: extendDefaultSetting(settings.classNames, defaultSettings.classNames),
             createContents: settings.createContents,
             createElement: ensureOptionalSetting(settings.createElement, defaultSettings.createElement),
             defaultSize: ensureOptionalSetting(settings.defaultSize, defaultSettings.defaultSize),
-            getAvailableContainerSize: ensureOptionalSetting(settings.getAvailableContainerSize, defaultSettings.getAvailableContainerSize),
+            getAvailableContainerHeight: ensureOptionalSetting(
+                settings.getAvailableContainerHeight,
+                defaultSettings.getAvailableContainerHeight),
             menuInitializer: ensureOptionalSetting(settings.menuInitializer, defaultSettings.menuInitializer),
             menus: ensureOptionalSetting(settings.menus, defaultSettings.menus),
-            setTimeout: ensureOptionalSetting(settings.setTimeout, defaultSettings.setTimeout),
             styles: overrideDefaultSetting(settings.styles, defaultSettings.styles),
-            transitionTime: ensureOptionalSetting(settings.transitionTime, defaultSettings.transitionTime),
             requirejs: ensureOptionalSetting(settings.requirejs, defaultSettings.requirejs),
         };
     }
@@ -133,7 +149,7 @@ export class UserWrappr implements IUserWrappr {
             container,
             createElement: this.settings.createElement,
             createContents: this.settings.createContents,
-            getAvailableContainerSize: this.settings.getAvailableContainerSize,
+            getAvailableContainerHeight: this.settings.getAvailableContainerHeight,
             menus: this.settings.menus,
             styles: this.settings.styles
         });
@@ -164,9 +180,7 @@ export class UserWrappr implements IUserWrappr {
             container: this.display.getContainer(),
             containerSize,
             menus: this.settings.menus,
-            setTimeout: this.settings.setTimeout,
-            styles: this.settings.styles,
-            transitionTime: this.settings.transitionTime
+            styles: this.settings.styles
         });
 
         return true;
@@ -195,7 +209,7 @@ export class UserWrappr implements IUserWrappr {
      */
     private async require<TResults>(modules: string[]): Promise<TResults> {
         return new Promise<TResults>((resolve, reject) => {
-            requirejs(modules, resolve, reject);
+            this.settings.requirejs(modules, resolve, reject);
         });
     }
 }

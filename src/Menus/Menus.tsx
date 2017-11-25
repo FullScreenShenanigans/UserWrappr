@@ -13,13 +13,13 @@ const renderMenuAndOptionsList = (stores: IMenuAndOptionsListStores) => (
 
 export const Menus = observer(({ store }: { store: MenusStore }) => {
     const style = {
-        ...store.styles.innerArea,
+        ...store.styles.menusInnerArea,
         width: `${store.containerSize.width}px`
     } as React.CSSProperties;
 
     return (
         <div
-            className={store.classNames.innerArea}
+            className={store.classNames.menusInnerArea}
             style={style}
         >
             {store.menuAndOptionListStores.map(renderMenuAndOptionsList)}

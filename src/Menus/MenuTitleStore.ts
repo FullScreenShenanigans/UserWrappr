@@ -11,9 +11,9 @@ export interface IMenuTitleStoreDependencies {
     classNames: IClassNames;
 
     /**
-     * Handler for the title being clicked.
+     * Handler for the title being hovered over, if any.
      */
-    onClick: () => void;
+    onMouseEnter?: () => void;
 
     /**
      * Styles to use for display elements.
@@ -52,10 +52,10 @@ export class MenuTitleStore {
     }
 
     /**
-     * Handler for the title being clicked.
+     * Handler for the title being hovered over, if any.
      */
-    public get onClick(): () => void {
-        return this.dependencies.onClick;
+    public get onMouseEnter(): (() => void) | undefined {
+        return this.dependencies.onMouseEnter;
     }
 
     /**

@@ -1,7 +1,7 @@
 import { AreasFaker } from "./Bootstrapping/AreasFaker";
 import { IClassNames } from "./Bootstrapping/ClassNames";
 import { ICreateElement } from "./Bootstrapping/CreateElement";
-import { IGetAvailableContainerSize } from "./Bootstrapping/GetAvailableContainerSize";
+import { IGetAvailableContainerHeight } from "./Bootstrapping/GetAvailableContainerHeight";
 import { IStyles } from "./Bootstrapping/Styles";
 import { IMenuSchema } from "./Menus/MenuSchemas";
 import { getAbsoluteSizeInContainer, IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
@@ -54,9 +54,9 @@ export interface IDisplayDependencies {
     createContents: ICreateContents;
 
     /**
-     * Gets the rectangular size of the window.
+     * Gets how much height is available to size a container.
      */
-    getAvailableContainerSize: IGetAvailableContainerSize;
+    getAvailableContainerHeight: IGetAvailableContainerHeight;
 
     /**
      * Menus to create inside of the view.
@@ -110,7 +110,7 @@ export class Display {
             this.dependencies.container.removeChild(this.createdElements.menuArea);
         }
 
-        const availableContainerSize: IAbsoluteSizeSchema = this.dependencies.getAvailableContainerSize(this.dependencies.container);
+        const availableContainerSize: IAbsoluteSizeSchema = this.getAvailableContainerSize(this.dependencies.container);
         const containerSize: IAbsoluteSizeSchema = getAbsoluteSizeInContainer(availableContainerSize, requestedSize);
         const { menuArea, menuSize } = await this.areasFaker.createAndAppendMenuArea(containerSize);
         const { contentSize, contentArea } = this.areasFaker.createContentArea(containerSize, menuSize);
@@ -121,5 +121,28 @@ export class Display {
         this.createdElements = { contentArea, menuArea };
 
         return containerSize;
+    }
+
+    /**
+     * @returns The container holding the contents and menus.
+     */
+    public getContainer(): HTMLElement {
+        return this.dependencies.container;
+    }
+
+    /**
+     * Gets how much space is available to size a container.
+     *
+     * @param container   Container element.
+     * @returns How much space is available to size the container.
+     */
+    private getAvailableContainerSize(container: HTMLElement): IAbsoluteSizeSchema {
+        const boundingArea = container.getBoundingClientRect();
+        const availableHeight = this.dependencies.getAvailableContainerHeight();
+
+        return {
+            height: availableHeight - Math.round(boundingArea.top),
+            width: Math.round(boundingArea.width)
+        };
     }
 }

@@ -2,7 +2,7 @@ import { IClassNames } from "../Bootstrapping/ClassNames";
 import { IStyles } from "../Bootstrapping/Styles";
 import { IAbsoluteSizeSchema } from "../Sizing";
 import { IMenuSchema } from "./MenuSchemas";
-import { ISetTimeout, MenuStore } from "./MenuStore";
+import { MenuStore } from "./MenuStore";
 import { OptionsStore } from "./Options/OptionsStore";
 
 /**
@@ -40,19 +40,9 @@ export interface IMenusStoreDependencies {
     menus: IMenuSchema[];
 
     /**
-     * Waits before calling an action.
-     */
-    setTimeout: ISetTimeout;
-
-    /**
      * Styles to use for display elements.
      */
     styles: IStyles;
-
-    /**
-     * How long to transition between visual states.
-     */
-    transitionTime: number;
 }
 
 export class MenusStore {
@@ -116,16 +106,15 @@ export class MenusStore {
         for (const menu of this.dependencies.menus) {
             const menuStore = new MenuStore({
                 classNames: this.dependencies.classNames,
-                setTimeout: this.dependencies.setTimeout,
                 styles: this.dependencies.styles,
-                title: menu.title,
-                transitionTime: this.dependencies.transitionTime
+                title: menu.title
             });
 
             const optionsStore = new OptionsStore({
                 classNames: this.dependencies.classNames,
                 containerSize: this.dependencies.containerSize,
-                onClick: menuStore.close,
+                onMouseLeave: menuStore.close,
+                onTitleMouseEnter: menuStore.open,
                 options: menu.options,
                 styles: this.dependencies.styles,
                 title: menu.title

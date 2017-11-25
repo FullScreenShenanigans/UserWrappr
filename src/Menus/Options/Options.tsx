@@ -45,6 +45,7 @@ export const Options = observer(({ store }: { store: OptionsStore }) => {
     return (
         <div
             className={store.classNames.options}
+            onMouseLeave={store.onMouseLeave}
             style={store.styles.options as React.CSSProperties}
         >
             <div
