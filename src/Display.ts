@@ -137,12 +137,11 @@ export class Display {
      * @returns How much space is available to size the container.
      */
     private getAvailableContainerSize(container: HTMLElement): IAbsoluteSizeSchema {
-        const boundingArea = container.getBoundingClientRect();
         const availableHeight = this.dependencies.getAvailableContainerHeight();
 
         return {
-            height: availableHeight - Math.round(boundingArea.top),
-            width: Math.round(boundingArea.width)
+            height: availableHeight - Math.round(container.offsetTop),
+            width: Math.round(container.clientWidth)
         };
     }
 }
