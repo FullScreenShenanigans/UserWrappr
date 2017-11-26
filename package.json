@@ -1,7 +1,7 @@
 {
   "name": "userwrappr",
   "typing": "./lib/index.d.ts",
-  "description": "Creates configurable HTML displays over fixed size contents.",
+  "description": "Creates configurable HTML displays over flexible-sized contents.",
   "version": "0.6.2",
   "author": {
     "name": "Josh Goldberg",
@@ -73,16 +73,14 @@
           "dev": "../node_modules/react/umd/react.development",
           "prod": "../node_modules/react/lib/react.production"
         },
-        "name": "react",
-        "requireExternalName": "React"
+        "name": "react"
       },
       {
         "js": {
           "dev": "../node_modules/react-dom/umd/react-dom.development",
           "prod": "../node_modules/react-dom/lib/react-dom.production"
         },
-        "name": "react-dom",
-        "requireExternalName": "ReactDOM"
+        "name": "react-dom"
       }
     ],
     "name": "UserWrappr"

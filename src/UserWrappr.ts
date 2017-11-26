@@ -95,7 +95,7 @@ const overrideDefaultSetting = <TSetting extends object>(value: Partial<TSetting
 };
 
 /**
- * Creates configurable HTML displays over fixed size contents.
+ * Creates configurable HTML displays over flexible-sized contents.
  */
 export class UserWrappr implements IUserWrappr {
     /**

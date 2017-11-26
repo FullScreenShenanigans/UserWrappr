@@ -126,7 +126,7 @@ export type IUserWrapprSettings = Partial<IPartialOptionalUserWrapprSettings> & 
 export type ICompleteUserWrapprSettings = IOptionalUserWrapprSettings & IRequiredUserWrapprSettings;
 
 /**
- * Creates configurable HTML displays over fixed size contents.
+ * Creates configurable HTML displays over flexible-sized contents.
  */
 export interface IUserWrappr {
     /**
