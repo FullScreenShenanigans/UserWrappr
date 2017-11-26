@@ -3,9 +3,16 @@ import { createElement } from "./Bootstrapping/CreateElement";
 import { getAvailableContainerHeight } from "./Bootstrapping/GetAvailableContainerHeight";
 import { defaultStyles } from "./Bootstrapping/Styles";
 import { Display } from "./Display";
-import { ICompleteUserWrapprSettings, IOptionalUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
+import { ICompleteUserWrapprSettings, IOptionalUserWrapprSettings, IRequireJs, IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
 import { IInitializeMenusView, IInitializeMenusViewWrapper } from "./Menus/InitializeMenus";
 import { IAbsoluteSizeSchema, IRelativeSizeSchema } from "./Sizing";
+
+/**
+ * Browser-only inclusion of requirejs.
+ *
+ * @see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/21310.
+ */
+declare const requirejs: IRequireJs;
 
 /**
  * View libraries required to initialize a wrapping display.

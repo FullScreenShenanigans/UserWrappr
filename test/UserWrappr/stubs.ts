@@ -4,7 +4,9 @@ import { SinonSpy, spy } from "sinon";
 import { IClassNames } from "../../src/Bootstrapping/ClassNames";
 import { createElement } from "../../src/Bootstrapping/CreateElement";
 import { IStyles } from "../../src/Bootstrapping/Styles";
-import { IOptionalUserWrapprSettings, IRequiredUserWrapprSettings, IUserWrappr, IUserWrapprSettings } from "../../src/IUserWrappr";
+import {
+    IOptionalUserWrapprSettings, IRequiredUserWrapprSettings, IRequireJs, IUserWrappr, IUserWrapprSettings
+} from "../../src/IUserWrappr";
 import { IAbsoluteSizeSchema } from "../../src/Sizing";
 import { UserWrappr } from "../../src/UserWrappr";
 
@@ -18,6 +20,13 @@ export interface ITestUserWrappr extends ITestUserWrapprSettings {
     container: HTMLElement;
     userWrapper: IUserWrappr;
 }
+
+/**
+ * Browser-only inclusion of requirejs.
+ *
+ * @see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/21310.
+ */
+declare const requirejs: IRequireJs;
 
 export const stubClassNames: IClassNames = {
     contentArea: "user-wrappr-stubs-content-area",

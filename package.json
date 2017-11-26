@@ -27,7 +27,6 @@
   "devDependencies": {
     "@types/react": "^16.0.22",
     "@types/react-dom": "^16.0.3",
-    "@types/requirejs": "^2.1.31",
     "gulp": "^3.9.1",
     "gulp-shenanigans": "^0.6.17"
   },
