@@ -38,6 +38,11 @@ export interface IStyles {
     inputButtonOn: Partial<CSSStyleDeclaration>;
 
     /**
+     * Styles for select dropdowns.
+     */
+    inputSelect: Partial<CSSStyleDeclaration>;
+
+    /**
      * Styles for a hidden children container in a menu.
      */
     menuChildrenClosed: Partial<CSSStyleDeclaration>;
@@ -113,6 +118,7 @@ export const defaultStyles: IStyles = {
     inputButtonBoolean: {},
     inputButtonOff: {},
     inputButtonOn: {},
+    inputSelect: {},
     menuChildrenOpen: {},
     menuChildrenClosed: {
         display: "none"

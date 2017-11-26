@@ -31,16 +31,23 @@ export class MultiSelectOption extends React.Component<{ store: SaveableStore<IM
         return selects;
     }
 
-    private renderSelect = (key: number): JSX.Element => (
-        <select
-            key={key}
-            onChange={(event) => this.changeValue(event, key)}
-            value={this.props.store.value[key]}
-            style={this.props.store.styles.input as React.CSSProperties}
-        >
-            {this.props.store.schema.options.map(this.renderOption)}
-        </select>
-    )
+    private renderSelect = (key: number): JSX.Element => {
+        const selectStyle = {
+            ...this.props.store.styles.input,
+            ...this.props.store.styles.inputSelect
+        } as React.CSSProperties;
+
+        return (
+            <select
+                key={key}
+                onChange={(event) => this.changeValue(event, key)}
+                value={this.props.store.value[key]}
+                style={selectStyle}
+            >
+                {this.props.store.schema.options.map(this.renderOption)}
+            </select>
+        );
+    }
 
     private renderOption = (option: string): JSX.Element => (
         <option key={option} value={option}>

@@ -8,6 +8,10 @@ import { SaveableStore } from "./SaveableStore";
 export class SelectOption extends React.Component<{ store: SaveableStore<ISelectSchema, string> }> {
     public render(): JSX.Element {
         const { store } = this.props;
+        const selectStyle = {
+            ...store.styles.input,
+            ...store.styles.inputSelect
+        } as React.CSSProperties;
 
         return (
             <div className={store.classNames.option} style={store.styles.option as React.CSSProperties}>
@@ -17,7 +21,7 @@ export class SelectOption extends React.Component<{ store: SaveableStore<ISelect
                 <div className={store.classNames.optionRight} style={store.styles.optionRight as React.CSSProperties}>
                     <select
                         onChange={this.changeValue}
-                        style={store.styles.input as React.CSSProperties}
+                        style={selectStyle}
                         value={this.props.store.value}
                     >
                         {this.props.store.schema.options.map(this.renderOption)}

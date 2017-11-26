@@ -6,8 +6,8 @@ import { IMenuAndOptionsListStores, MenusStore } from "./MenusStore";
 import { Options } from "./Options/Options";
 
 const renderMenuAndOptionsList = (stores: IMenuAndOptionsListStores) => (
-    <Menu store={stores.menu}>
-        <Options key={stores.menu.titleStore.title} store={stores.options} />
+    <Menu key={stores.menu.titleStore.title} store={stores.menu}>
+        <Options store={stores.options} />
     </Menu>
 );
 
