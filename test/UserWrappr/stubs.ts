@@ -56,6 +56,9 @@ export const stubStyles: IStyles = {
     inputButtonOn: {
         textAlign: "center"
     },
+    inputSelect: {
+        textAlign: "left"
+    },
     menuChildrenOpen: {
         textAlign: "right"
     },
