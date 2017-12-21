@@ -1,14 +1,12 @@
 import { BrowserClock, createClock } from "lolex";
 import { SinonSpy, spy } from "sinon";
 
-import { IClassNames } from "../../src/Bootstrapping/ClassNames";
-import { createElement } from "../../src/Bootstrapping/CreateElement";
-import { IStyles } from "../../src/Bootstrapping/Styles";
-import {
-    IOptionalUserWrapprSettings, IRequiredUserWrapprSettings, IRequireJs, IUserWrappr, IUserWrapprSettings
-} from "../../src/IUserWrappr";
-import { IAbsoluteSizeSchema } from "../../src/Sizing";
-import { UserWrappr } from "../../src/UserWrappr";
+import { IClassNames } from "./Bootstrapping/ClassNames";
+import { createElement } from "./Bootstrapping/CreateElement";
+import { IStyles } from "./Bootstrapping/Styles";
+import { IOptionalUserWrapprSettings, IRequiredUserWrapprSettings, IRequireJs, IUserWrappr, IUserWrapprSettings } from "./IUserWrappr";
+import { IAbsoluteSizeSchema } from "./Sizing";
+import { UserWrappr } from "./UserWrappr";
 
 export interface ITestUserWrapprSettings extends IOptionalUserWrapprSettings, IRequiredUserWrapprSettings {
     contents: Element;
