@@ -8,7 +8,7 @@
     "url": "https://github.com/FullScreenShenanigans/UserWrappr/issues"
   },
   "dependencies": {
-    "mobx": "^3.4.1",
+    "mobx": "^4.0.0",
     "mobx-react": "^4.3.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
